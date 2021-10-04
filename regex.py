@@ -1,7 +1,7 @@
 import ply.lex as lex
 
-# module: regex.py
-# This module just contains the lexing rules
+# moduleo: regex.py
+# Este módulo contêm as expressões regulares do lexer
 
 
 # Palavras reservadas
@@ -21,7 +21,7 @@ tokens=[
 	'RELOP',
 	'ARIOP', # Operador aritmético
 	'COMMENT',
-	'ATRIBUITION',
+	'ATTRIBUTION',
 	'COMMA',
 	'SEMICOLON',
 	'PARENTHESES',
@@ -36,19 +36,15 @@ tokens =  tokens + list(reservadas.values())
 # Expressões regulares que definem os tokens
 
 digito = r'([0-9])'
-letra = r'([a-zA-Z])'
 
 t_NUM          = r'('+digito + r'+' + digito +r'*)'
-t_RELOP        = r'< | <= | > | >= | == | !='
-t_ARIOP        = r'\+ | \- | \* | /'
-t_ATRIBUITION  = r'='
+t_ATTRIBUTION  = r'='
 t_COMMA        = r','
 t_SEMICOLON    = r';'
-t_PARENTHESES  = r'\( | \)'
-t_BRACKETS = r'\[ | \]'
-t_BRACES = r'\{ | \}'
 
+t_ignore  = ' \t \n'# Ignora tabulação e nova linha
 
+	
 def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
 	t.type = reservadas.get(t.value,'ID')
@@ -57,14 +53,59 @@ def t_ID(t):
 def t_COMMENT(t):
 	r'/\*.*\*/'
 	pass
+	
+def t_RELOP(t):
+	r'< | <= | > | >= | == | !='
+	if(t.value=='>'):
+		t.value=['>','GT']
+	if(t.value=='>='):
+		t.value=['>=','GE']
+	if(t.value=='<'):
+		t.value=['<','LT']
+	if(t.value=='<='):
+		t.value=['<=','LE']
+	if(t.value=='=='):
+		t.value=['==','EQ']
+	if(t.value=='!='):
+		t.value=['!=','NE']	
+	return t
+	
+def t_ARIOP(t):
+	r'\+ | \- | \* | /'
+	if(t.value=='+'):
+		t.value = ['+','PLUS']
+	if(t.value=='-'):
+		t.value = ['-','MINUS']
+	if(t.value=='*'):
+		t.value = ['*','TIMES']
+	if(t.value=='/'):
+		t.value = ['/','DIVIDE']
+	return t
 
-######################################################################################
-#				TESTES
-######################################################################################
 
-# A string containing ignored characters (spaces and tabs)
-t_ignore  = ' \t \n'
+def t_PARENTHESES(t):
+	r'\( | \)'
+	if(t.value=='('):
+		t.value=['PARENTHESES','OP']
+	if(t.value==')'):
+		t.value=['PARENTHESES','CP']
+	return t
+	
+def t_BRACKETS(t):
+	r'\[ | \]'
+	if(t.value=='['):
+		t.value=['BRACKETS','OBT']
+	if(t.value==']'):
+		t.value=['BRACKETS','CBT']
+	return t
 
+def t_BRACES(t):
+	r'\{ | \}'
+	if(t.value=='{'):
+		t.value=['BRACES','OBC']
+	if(t.value=='}'):
+		t.value=['BRACES','CBC']
+	return t
 
 # Error handling rule
 def t_error(t):
@@ -72,10 +113,17 @@ def t_error(t):
      t.lexer.skip(1)
 
 
+
+
+######################################################################################
+#				TESTES
+######################################################################################
+
+
 lexer = lex.lex();
 
 # Test it out
-data =  'var=5; /*\'COMENTÁRIO\'*/ \nif(var>5){\n\tvar = var + 1;\n}'
+data =  'var=50; /*\'COMENTÁRIO\' EOF eof */ \nif(var>5){\n\tvar = var + 1;\n}'
 
 print(data)
  # Give the lexer some input
@@ -87,7 +135,7 @@ while True:
      tok = lexer.token()
      if not tok: 
          break      # No more input
-     print(tok)
+     print(tok.value, tok.type)
      i=i+1
      
 print(i)
