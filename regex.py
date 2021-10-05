@@ -42,8 +42,9 @@ t_ATTRIBUTION  = r'='
 t_COMMA        = r','
 t_SEMICOLON    = r';'
 
-t_ignore  = ' \t \n'# Ignora tabulação e nova linha
+t_ignore  = ' \t \n'# Ignora tabulação 
 
+	
 	
 def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
@@ -51,8 +52,9 @@ def t_ID(t):
 	return t;
 
 def t_COMMENT(t):
-	r'/\*.*\*/'
-	pass
+	r'/\* (. | \n)* \*/'
+	return t
+	
 	
 def t_RELOP(t):
 	r'< | <= | > | >= | == | !='
@@ -107,45 +109,16 @@ def t_BRACES(t):
 		t.value=['BRACES','CBC']
 	return t
 
-# Error handling rule
+# Regra para caracteres ilegais. A assinatura do método DEVE ser em letras minúsculas
 def t_error(t):
-     print("Illegal character '%s'" % t.value[0])
-     t.lexer.skip(1)
-
-
-
-
-######################################################################################
-#				TESTES
-######################################################################################
-
-
-lexer = lex.lex();
-
-# Test it out
-data =  'var=50; /*\'COMENTÁRIO\' EOF eof */ \nif(var>5){\n\tvar = var + 1;\n}'
-
-print(data)
- # Give the lexer some input
-lexer.input(data)
- 
-# Tokenize
-i=0
-while True:
-     tok = lexer.token()
-     if not tok: 
-         break      # No more input
-     print(tok.value, tok.type)
-     i=i+1
-     
-print(i)
-
-
-
-
-
-
-
+	print("ERROR: caracter ilegal: "+ t.value[0]+ " in line "+str(t.lineno))
+	t.lexer.skip(1)
+'''
+# Regra que conta número de linhas
+def t_numLinhas(t):
+	r'\n+'
+	t.lexer.lineno += len(t.value) 
+'''
 
 
 
