@@ -3,7 +3,6 @@ import ply.lex as lex
 # modulo: regex.py
 # Este módulo contêm as expressões regulares do lexer
 
-
 # Palavras reservadas
 reservadas = {
 	'else' : 'ELSE',
@@ -116,12 +115,13 @@ def t_BRACES(t):
 def t_error(t):
 	print("ERROR: caracter ilegal: "+ t.value[0]+ " in line "+str(t.lineno))
 	t.lexer.skip(1)
-'''
+
 # Regra que conta número de linhas
 def t_numLinhas(t):
 	r'\n+'
 	t.lexer.lineno += len(t.value) 
-'''
+
+
 
 
 

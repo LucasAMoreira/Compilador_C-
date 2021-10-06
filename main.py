@@ -1,11 +1,13 @@
 import regex
 import ply.lex as lex
 
+
 # Cria lexer com base nas expressões regulares do arquivo regex.py
-lexer = lex.lex(module=regex, optimize =1);
+# NÃO ativamos o modo 'optmize', pois com ele não podemos identificar qual é a linha
+lexer = lex.lex(module=regex);
 
 # Abre arquivo e armazena seu conteúdo na variável 'programa'
-arq = open('./Testes/sort.c-','r')
+arq = open('./Testes/gcd.c-','r')
 programa = arq.read();
 
 # Lexer recebe programa como entrada
@@ -17,7 +19,7 @@ while True:
 	tok = lexer.token()
 	if not tok: 
 		break     
-	print(tok.value, tok.type, tok.lineno)
+	print(tok)
 	i=i+1
 
 print('Número de tokens: '+str(i))
