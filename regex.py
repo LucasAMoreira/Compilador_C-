@@ -60,10 +60,6 @@ def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
 	t.type = reservadas.get(t.value,'ID')
 	return t;
-
-def t_COMMENT(t):
-	r'/\* ([^(abre)] | [^(*/)])* \*/'
-	pass
 	
 	
 def t_RELOP(t):
@@ -81,6 +77,11 @@ def t_RELOP(t):
 	if(t.value=='!='):
 		t.value=['!=','NE']	
 	return t
+
+# DEVE estar antes de ARIOP
+def t_COMMENT(t):	
+	r'(/\*){1}([^{/*}] | \*[^/] | /[^\*])*(\*/){1}'
+	pass
 	
 def t_ARIOP(t):
 	r'\+ | \- | \* | /'
@@ -110,6 +111,8 @@ def t_BRACES(t):
 	if(t.value=='}'):
 		t.value=['BRACES','CBC']
 	return t
+
+
 
 # Regra para caracteres ilegais. A assinatura do método DEVE ser em letras minúsculas
 def t_error(t):
