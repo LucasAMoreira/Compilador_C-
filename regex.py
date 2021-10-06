@@ -1,6 +1,6 @@
 import ply.lex as lex
 
-# moduleo: regex.py
+# modulo: regex.py
 # Este módulo contêm as expressões regulares do lexer
 
 
@@ -16,6 +16,7 @@ reservadas = {
 
 # Lista de tokens
 tokens=[
+	'BRACKETS', #colchetes
 	'ID',
 	'NUM',
 	'RELOP',
@@ -24,8 +25,7 @@ tokens=[
 	'ATTRIBUTION',
 	'COMMA',
 	'SEMICOLON',
-	'PARENTHESES',
-	'BRACKETS', #colchetes
+	'PARENTHESES',	
 	'BRACES',# chave	
 ];
 
@@ -42,18 +42,29 @@ t_ATTRIBUTION  = r'='
 t_COMMA        = r','
 t_SEMICOLON    = r';'
 
-t_ignore  = ' \t \n'# Ignora tabulação 
+t_ignore  = ' \t '# Ignora tabulação 
+
+abre = r'/\*'	
+fecha = r'\*/'
 
 	
-	
+def t_BRACKETS(t):
+	r'\[ | \]'
+	if(t.value=='['):
+		t.value=['BRACKETS','OBT']
+	if(t.value==']'):
+		t.value=['BRACKETS','CBT']
+	return t
+
+
 def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
 	t.type = reservadas.get(t.value,'ID')
 	return t;
 
 def t_COMMENT(t):
-	r'/\* (. | \n)* \*/'
-	return t
+	r'/\* ([^(abre)] | [^(*/)])* \*/'
+	pass
 	
 	
 def t_RELOP(t):
@@ -91,14 +102,6 @@ def t_PARENTHESES(t):
 		t.value=['PARENTHESES','OP']
 	if(t.value==')'):
 		t.value=['PARENTHESES','CP']
-	return t
-	
-def t_BRACKETS(t):
-	r'\[ | \]'
-	if(t.value=='['):
-		t.value=['BRACKETS','OBT']
-	if(t.value==']'):
-		t.value=['BRACKETS','CBT']
 	return t
 
 def t_BRACES(t):
