@@ -34,7 +34,7 @@ else:
 		if(type(tok.value)==list):
 			TS.adiciona(tok.value[0],tok.type,tok.value[1])
 		else:
-			TS.adiciona(tok.value,tok.type,'--')
+			TS.adiciona(tok.value,tok.type,tok.lineno)
 		i=i+1
 
 	print('Número de tokens: '+str(i))
