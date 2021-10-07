@@ -1,4 +1,5 @@
 import regex
+from TabelaSimbolos import *
 import ply.lex as lex
 import sys
 
@@ -11,6 +12,8 @@ if(len(sys.argv)==1):
 	print('ERROR: Arquivo de entrada não especificado!')
 
 else:
+
+	TS = TabelaSimbolos()
 
 	# Nome do arquivo de entrada do lexer
 	parametro = sys.argv[1]
@@ -25,14 +28,19 @@ else:
 	# Enquanto houver conteúdo, lê e tokeniza
 	i=0
 	while True:
-		tok = lexer.token()
+		tok = lexer.token()		
 		if not tok: 
 			break     
-		print(tok)
+		if(type(tok.value)==list):
+			TS.adiciona(tok.value[0],tok.type,tok.value[1])
+		else:
+			TS.adiciona(tok.value,tok.type,'--')
 		i=i+1
 
 	print('Número de tokens: '+str(i))
 	arq.close();
+	
+	TS.imprime()
 
 
 

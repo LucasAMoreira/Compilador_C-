@@ -50,9 +50,9 @@ fecha = r'\*/'
 def t_BRACKETS(t):
 	r'\[ | \]'
 	if(t.value=='['):
-		t.value=['BRACKETS','OBT']
+		t.value=['[','OBT']
 	if(t.value==']'):
-		t.value=['BRACKETS','CBT']
+		t.value=[']','CBT']
 	return t
 
 
@@ -99,17 +99,17 @@ def t_ARIOP(t):
 def t_PARENTHESES(t):
 	r'\( | \)'
 	if(t.value=='('):
-		t.value=['PARENTHESES','OP']
+		t.value=['(','OP']
 	if(t.value==')'):
-		t.value=['PARENTHESES','CP']
+		t.value=[')','CP']
 	return t
 
 def t_BRACES(t):
 	r'\{ | \}'
 	if(t.value=='{'):
-		t.value=['BRACES','OBC']
+		t.value=['{','OBC']
 	if(t.value=='}'):
-		t.value=['BRACES','CBC']
+		t.value=['}','CBC']
 	return t
 
 
