@@ -116,9 +116,12 @@ def t_BRACES(t):
 
 # Regra para caracteres ilegais. A assinatura do método DEVE ser em letras minúsculas
 def t_error(t):
-	print("ERROR: caracter ilegal: "+ t.value[0]+ " in line "+str(t.lineno))
+	#("ERROR: caracter ilegal: "+ t.value[0]+ " in line "+str(t.lineno))
+	t.value=t.value[0]	
+	t.type='ERROR'
 	t.lexer.skip(1)
-
+	return t
+	
 # Regra que conta número de linhas
 def t_numLinhas(t):
 	r'\n+'
