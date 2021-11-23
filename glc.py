@@ -1,5 +1,8 @@
 import ply.yacc as yacc
+import ply.lex as lex
 from regex import tokens
+
+import warnings
 
 
 # ATENÇÃO: ':' É SEPARADO POR ESPAÇO!
@@ -56,7 +59,7 @@ def p_param(p):
 
 def p_composto_decl(p):
 	'''
-	composto_decl : '{' local_declaracao statement_lista '}'
+	composto_decl : '{' local_declaracoes statement_lista '}'
 	'''
 
 def p_local_declaracoes(p):
@@ -74,7 +77,7 @@ def p_statement_lista(p):
 def p_statement(p):
 	'''
 	statement : expressao_decl
-			| composto decl 
+			| composto_decl 
 			| selecao_decl 
 			| iteracao_decl 
 			| retorno_decl
@@ -86,7 +89,7 @@ def p_expressao_decl(p):
 				| ';'
 	'''
 
-def selecao_decl(p):
+def p_selecao_decl(p):
 	'''
 	selecao_decl : IF '(' expressao ')' statement
 			   | IF '(' expressao ')' statement ELSE statement
@@ -165,7 +168,7 @@ def p_ativacao(p):
 def p_args(p):
 	'''
 	args : arg_lista 
-		| lista
+		| vazio
 	'''
 	
 def p_arg_lista(p):
@@ -174,25 +177,45 @@ def p_arg_lista(p):
 			| expressao
 	'''
 
+def p_vazio(p):
+	'''
+	vazio :
+	'''
+	pass
 
+
+
+"""
+def p_id(p):
+	'''
+	id : ID
+	'''
+"""
 # O TRECHO ABAIXO ESTÁ NA DOCUMENTAÇÃO DO PLY
 # ESTAMOS USANDO APENAS PARA TESTES
+
 
 
 # Error rule for syntax errors
 def p_error(p):
 	print("Syntax error in input!")
- 
-# Build the parser
+
+'''  Build the parser
 parser = yacc.yacc()
- 
+
+teste = "int x = 0;"
+parser.parse(lexer=lexer)
+
 while True:
 	try:
-		s = raw_input('calc > ')
+		s = input('calc > ')
 	except EOFError:
 		break
 	if not s: continue
 	result = parser.parse(s)
 	print(result)
+
+warnings.warn("Warning...........Message")
+'''
 
 
