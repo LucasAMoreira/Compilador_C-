@@ -25,12 +25,11 @@ tokens=[
 	'COMMA',
 	'SEMICOLON',
 	'PARENTHESES',	
-	'BRACES',# chave	
-];
+	'BRACES'# chave	
+]
 
 # Tokens são a lista anterior e as palavras reservadas.
 tokens =  tokens + list(reservadas.values())
-
 
 # Expressões regulares que definem os tokens
 
@@ -41,7 +40,7 @@ t_ATTRIBUTION  = r'='
 t_COMMA        = r','
 t_SEMICOLON    = r';'
 
-t_ignore  = ' \t '# Ignora tabulação 
+t_ignore  = ' \t'# Ignora tabulação 
 
 abre = r'/\*'	
 fecha = r'\*/'
@@ -59,7 +58,7 @@ def t_BRACKETS(t):
 def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
 	t.type = reservadas.get(t.value,'ID')
-	return t;
+	return t
 	
 	
 def t_RELOP(t):
@@ -127,8 +126,7 @@ def t_numLinhas(t):
 	r'\n+'
 	t.lexer.lineno += len(t.value) 
 
-
-
+lexer = lex.lex()
 
 
 
