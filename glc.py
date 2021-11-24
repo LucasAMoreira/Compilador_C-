@@ -48,7 +48,15 @@ def p_fun_declaracao(p):
 	'''
 	fun_declaracao : tipo_especificador ID PARENTHESES params PARENTHESES composto_decl
 	'''
-	p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+	x=[]
+	x.append(p[1])
+	x.append(p[2])
+	x.append(p[3])
+	x.append(p[4])
+	x.append(p[5])
+	x.append(p[6])	
+	p[0] = x
+	#p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
  
 def p_params(p):
 	'''
@@ -81,7 +89,18 @@ def p_composto_decl(p):
 	'''
 	composto_decl : BRACES local_declaracoes statement_lista BRACES
 	'''
-	p[0] = p[1] + p[2] + p[3] + p[4]
+	#	print("########################################################")
+	#	print(p[1])
+	#	print(p[2])
+	#	print(p[3])
+	#	print(p[4])
+	x=[]
+	x.append(p[1])
+	x.append(p[2])
+	x.append(p[3])
+	x.append(p[4])
+	p[0] = x
+	
 	
 def p_local_declaracoes(p):
 	'''
@@ -99,7 +118,11 @@ def p_statement_lista(p):
 				 | vazio
 	'''
 	if len(p) == 3:
-		p[0] = p[1] + p[2]
+		x = []
+		x.append(p[1])
+		x.append(p[2])
+		p[0]=x	
+		#p[0] = p[1] + p[2]
 	else:
 		p[0] = p[1]
   
@@ -284,8 +307,17 @@ def p_id(p):
 # def p_error(p):
 # 	print("Syntax error in input!")
 
+
 # Build the parser
 programa = open('gcd.c-', 'r').read()
+programa = """
+int vazio(void){
+	int x;
+	x = 0;
+	return 0;
+}
+
+"""
 lexer = regex.lexer
 lexer.input(programa)
 tokens = regex.tokens
