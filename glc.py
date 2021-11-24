@@ -32,10 +32,15 @@ def p_var_declaracao(p):
 	var_declaracao : tipo_especificador ID SEMICOLON	
 		| tipo_especificador ID BRACKETS NUM BRACKETS SEMICOLON
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
 	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
+		p[0] = x #p[1] + p[2] + p[3]
 	else:
-		p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
   
 def p_tipo_especificador(p):
 	'''
@@ -70,20 +75,32 @@ def p_param_lista(p):
 	param_lista : param_lista COMMA param
 			  | param
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+	
 	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
+		p[0] = x #p[1] + p[2] + p[3]
 	else:
-		p[0] = p[1]
+		p[0] = x #p[1]
  
 def p_param(p):
 	'''
 	param : tipo_especificador ID 
 		 | tipo_especificador ID BRACKETS BRACKETS
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+		
 	if len(p) == 3:
-		p[0] = p[1] + p[2]
+		p[0] = x #p[1] + p[2]
 	else:
-		p[0] = p[1] + p[2] + p[3] + p[4]
+		p[0] = x #p[1] + p[2] + p[3] + p[4]
   
 def p_composto_decl(p):
 	'''
@@ -141,20 +158,31 @@ def p_expressao_decl(p):
 	expressao_decl : expressao SEMICOLON
 				| SEMICOLON
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+
 	if len(p) == 3:
-		p[0] = p[1] + p[2]
+		p[0] = x #p[1] + p[2]
 	else:
-		p[0] = p[1]
+		p[0] = x #p[1]
   
 def p_selecao_decl(p):
 	'''
 	selecao_decl : IF PARENTHESES expressao PARENTHESES statement
 			   | IF PARENTHESES expressao PARENTHESES statement ELSE statement
 	'''
-	if len(p) == 6:
-		p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+	if len(p) == 6:		
+		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5]
 	else:
-		p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7]
+		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7]
 
 def p_iteracao_decl(p):
 	'''
@@ -167,20 +195,31 @@ def p_retorno_decl(p):
 	retorno_decl : RETURN SEMICOLON
 			   | RETURN expressao SEMICOLON
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
 	if len(p) == 3:
-		p[0] = p[1] + p[2]
+		p[0] = x #p[1] + p[2]
 	else:
-		p[0] = p[1] + p[2] + p[3]
+		p[0] = x #p[1] + p[2] + p[3]
 	
 def p_expressao(p):
 	'''
 	expressao : var ATTRIBUTION expressao
 			| simples_expressao
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+
 	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
+		p[0] = x #p[1] + p[2] + p[3]
 	else:
-		p[0] = p[1]
+		p[0] = x #p[1]
   
 def p_var(p):
 	'''
@@ -246,6 +285,7 @@ def p_mult(p):
 	'''
 	p[0] = p[1]
  
+# MODIFICADO 
 def p_fator(p):
 	'''
 	fator : PARENTHESES expressao PARENTHESES
@@ -261,8 +301,18 @@ def p_fator(p):
 def p_ativacao(p):
 	'''
 	ativacao : ID PARENTHESES args PARENTHESES
+		    | ID PARENTHESES PARENTHESES
 	'''
-	p[0] = p[1] + p[2] + p[3] + p[4]
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
+
+	if(len(p)==5):
+		p[0] = x #p[1] + p[2] + p[3] + p[4]
+	else:
+		p[0] = x #p[1] + p[2] + p[3]
  
 def p_args(p):
 	'''
@@ -276,22 +326,29 @@ def p_arg_lista(p):
 	arg_lista : arg_lista COMMA expressao
 			| expressao
 	'''
+	x=[]
+	i=1
+	while(i<len(p)):
+		x.append(p[i])
+		i=i+1 
 	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
+		p[0] = x#p[1] + p[2] + p[3]
 	else:
-		p[0] = p[1]
-  
+		p[0] = x#p[1]
+		  
 def p_vazio(p):
 	'''
 	vazio :
 	'''
 	pass
 
+
 def p_error(p):
 	if p:
 		print("Erro sintático na linha %d" % p.lineno)
 	else:
 		print("Erro sintático na linha %d" % lexer.lineno)
+
 
 
 """
@@ -310,14 +367,33 @@ def p_id(p):
 
 # Build the parser
 programa = open('gcd.c-', 'r').read()
-programa = """
+"""
+
+/* COMENTÁRIO */
 int vazio(void){
-	int x;
-	x = 0;
+	if (1<2){
+		int x;
+		x = 0;
+	}else{
+		return 1;
+	}
+	int y;
+	y = 2/3*4;
 	return 0;
 }
-
 """
+
+programa = """
+/* Um programa para calcular o mdc
+   segundo o algoritmo de Euclides */  
+    
+   int gcd (int u, int v){
+      if (v==0) return u;
+      else return gcd(u,v,1);
+      /* u-u/v*v == u mod v */
+   }
+"""
+
 lexer = regex.lexer
 lexer.input(programa)
 tokens = regex.tokens
