@@ -15,7 +15,8 @@ reservadas = {
 
 # Lista de tokens
 tokens=[
-	'BRACKETS', #colchetes
+	'OBT', #abre colchetes
+	'CBT', # fecha colchetes
 	'ID',
 	'NUM',
 	'RELOP',
@@ -24,8 +25,10 @@ tokens=[
 	'ATTRIBUTION',
 	'COMMA',
 	'SEMICOLON',
-	'PARENTHESES',	
-	'BRACES'# chave	
+	'OP',
+	'CP',	
+	'OBR',# abre chaves
+	'CBR'	
 ]
 
 # Tokens são a lista anterior e as palavras reservadas.
@@ -46,6 +49,15 @@ abre = r'/\*'
 fecha = r'\*/'
 
 	
+t_OBT =r'\['
+t_CBT = r'\]'
+t_OP = r'\('
+t_CP = r'\)'
+t_OBR = r'\{'
+t_CBR = r'\}'	
+	
+
+"""	
 def t_BRACKETS(t):
 	r'\[ | \]'
 	if(t.value=='['):
@@ -53,7 +65,7 @@ def t_BRACKETS(t):
 	if(t.value==']'):
 		t.value=[']','CBT']
 	return t
-
+"""
 
 def t_ID(t):
 	r'([a-zA-Z] + [a-zA-Z]*)'
@@ -94,7 +106,7 @@ def t_ARIOP(t):
 		t.value = ['/','DIVIDE']
 	return t
 
-
+"""
 def t_PARENTHESES(t):
 	r'\( | \)'
 	if(t.value=='('):
@@ -110,7 +122,7 @@ def t_BRACES(t):
 	if(t.value=='}'):
 		t.value=['}','CBC']
 	return t
-
+"""
 
 
 # Regra para caracteres ilegais. A assinatura do método DEVE ser em letras minúsculas

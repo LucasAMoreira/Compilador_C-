@@ -2,12 +2,17 @@ import ply.yacc as yacc
 import ply.lex as lex
 # from regex import tokens
 import regex
-
+from AST import *
 import warnings
+
+AST = AST()
 
 def p_programa(p):
 	'programa : declaracao_lista'
-	p[0] = p[1]
+	#p[0] = p[1]
+	p[0] = ('programa',p[1])
+	global raiz
+	raiz = p[0]
 	
  
 def p_declaracao_lista(p):
@@ -17,8 +22,10 @@ def p_declaracao_lista(p):
 	'''
 	if len(p) == 3:
 		p[0] = p[1] + p[2]
+		p[0] = ('declaração-lista',p[1],p[2])
 	else:
 		p[0] = p[1]
+		p[0] = ('declaração-lista',p[1])
  
 def p_declaracao(p):
 	'''
@@ -26,11 +33,12 @@ def p_declaracao(p):
 			| fun_declaracao
 	'''
 	p[0] = p[1]
+	p[0] = ('declaração',p[1])
  
 def p_var_declaracao(p):
 	'''
 	var_declaracao : tipo_especificador ID SEMICOLON	
-		| tipo_especificador ID BRACKETS NUM BRACKETS SEMICOLON
+		| tipo_especificador ID OBT NUM CBT SEMICOLON
 	'''
 	x=[]
 	i=1
@@ -39,8 +47,10 @@ def p_var_declaracao(p):
 		i=i+1 
 	if len(p) == 4:
 		p[0] = x #p[1] + p[2] + p[3]
+		p[0] = ('var-declaração',p[1],p[2],p[3])
 	else:
 		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+		p[0] = ('var-declaração',p[1],p[2],p[3])
   
 def p_tipo_especificador(p):
 	'''
@@ -48,10 +58,11 @@ def p_tipo_especificador(p):
 				    | VOID
 	'''
 	p[0] = p[1]
+	p[0] = ('tipo-especificador',p[1])
   
 def p_fun_declaracao(p):
 	'''
-	fun_declaracao : tipo_especificador ID PARENTHESES params PARENTHESES composto_decl
+	fun_declaracao : tipo_especificador ID OP params CP composto_decl
 	'''
 	x=[]
 	x.append(p[1])
@@ -62,6 +73,7 @@ def p_fun_declaracao(p):
 	x.append(p[6])	
 	p[0] = x
 	#p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+	p[0] = ('fun-declaração', p[1], p[2], p[3], p[4], p[5], p[6])
  
 def p_params(p):
 	'''
@@ -89,7 +101,7 @@ def p_param_lista(p):
 def p_param(p):
 	'''
 	param : tipo_especificador ID 
-		 | tipo_especificador ID BRACKETS BRACKETS
+		 | tipo_especificador ID OBT CBT
 	'''
 	x=[]
 	i=1
@@ -104,7 +116,7 @@ def p_param(p):
   
 def p_composto_decl(p):
 	'''
-	composto_decl : BRACES local_declaracoes statement_lista BRACES
+	composto_decl : OBR local_declaracoes statement_lista CBR
 	'''
 	#	print("########################################################")
 	#	print(p[1])
@@ -171,8 +183,8 @@ def p_expressao_decl(p):
   
 def p_selecao_decl(p):
 	'''
-	selecao_decl : IF PARENTHESES expressao PARENTHESES statement
-			   | IF PARENTHESES expressao PARENTHESES statement ELSE statement
+	selecao_decl : IF OP expressao CP statement
+			   | IF OP expressao CP statement ELSE statement
 	'''
 	x=[]
 	i=1
@@ -186,7 +198,7 @@ def p_selecao_decl(p):
 
 def p_iteracao_decl(p):
 	'''
-	iteracao_decl : WHILE PARENTHESES expressao PARENTHESES statement
+	iteracao_decl : WHILE OP expressao CP statement
 	'''
 	p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
  
@@ -224,7 +236,7 @@ def p_expressao(p):
 def p_var(p):
 	'''
 	var : ID
-	    | ID BRACKETS expressao BRACKETS
+	    | ID OBT expressao CBT
 	'''
 	if len(p) == 2:
 		p[0] = p[1]
@@ -288,7 +300,7 @@ def p_mult(p):
 # MODIFICADO 
 def p_fator(p):
 	'''
-	fator : PARENTHESES expressao PARENTHESES
+	fator : OP expressao CP
 		 | var
 		 | ativacao
 		 | NUM
@@ -300,8 +312,8 @@ def p_fator(p):
      
 def p_ativacao(p):
 	'''
-	ativacao : ID PARENTHESES args PARENTHESES
-		    | ID PARENTHESES PARENTHESES
+	ativacao : ID OP args CP
+		    | ID OP CP
 	'''
 	x=[]
 	i=1
@@ -366,7 +378,7 @@ def p_id(p):
 
 
 # Build the parser
-programa = open('gcd.c-', 'r').read()
+programa = open('sort.c-', 'r').read()
 """
 
 /* COMENTÁRIO */
@@ -382,8 +394,8 @@ int vazio(void){
 	return 0;
 }
 """
-
-programa = """
+"""
+programa = 
 /* Um programa para calcular o mdc
    segundo o algoritmo de Euclides */  
     
@@ -403,6 +415,8 @@ parser = yacc.yacc(debug=True)
 try:
 	teste = parser.parse(programa, lexer=lexer,debug=True)
 	print(teste)
+	print("######################")
+	print(raiz)
 except EOFError:
 	print("EOF")
 	pass
