@@ -4,8 +4,9 @@ import ply.lex as lex
 import regex
 # from AST import *
 import warnings
-# 
-# AST = AST()
+import sys
+
+AST = AST()
 
 def p_programa(p):
 	'programa : declaracao_lista'
@@ -81,6 +82,7 @@ def p_params(p):
 		  | VOID
 	'''
 	p[0] = p[1]
+	p[0] = ('params',p[1])
 
 def p_param_lista(p):
 	'''
@@ -95,8 +97,10 @@ def p_param_lista(p):
 	
 	if len(p) == 4:
 		p[0] = x #p[1] + p[2] + p[3]
+		p[0] = ('param-lista', p[1], p[2], p[3])
 	else:
 		p[0] = x #p[1]
+		p[0] = ('param-lista', p[1])
  
 def p_param(p):
 	'''
@@ -111,8 +115,10 @@ def p_param(p):
 		
 	if len(p) == 3:
 		p[0] = x #p[1] + p[2]
+		p[0] = ('param', p[1], p[2])
 	else:
 		p[0] = x #p[1] + p[2] + p[3] + p[4]
+		p[0] = ('param', p[1], p[2], p[3], p[4])
   
 def p_composto_decl(p):
 	'''
@@ -129,6 +135,7 @@ def p_composto_decl(p):
 	x.append(p[3])
 	x.append(p[4])
 	p[0] = x
+	p[0] = ('composto-decl', p[1], p[2], p[3], p[4])
 	
 	
 def p_local_declaracoes(p):
@@ -138,8 +145,10 @@ def p_local_declaracoes(p):
 	'''
 	if len(p) == 3 and p[1] and p[2]:
 		p[0] = p[1] + p[2]
+		p[0] = ('local-declarações', p[1], p[2])
 	else:
 		p[0] = p[1]
+		p[0] = ('local-declarações', p[1])
   
 def p_statement_lista(p):
 	'''
@@ -152,8 +161,10 @@ def p_statement_lista(p):
 		x.append(p[2])
 		p[0]=x	
 		#p[0] = p[1] + p[2]
+		p[0] = ('statement-lista', p[1], p[2])
 	else:
 		p[0] = p[1]
+		p[0] = ('statement-lista', p[1])
   
 def p_statement(p):
 	'''
@@ -164,6 +175,7 @@ def p_statement(p):
 			| retorno_decl
 	'''
 	p[0] = p[1]
+	p[0] = ('statement', p[1])
  
 def p_expressao_decl(p):
 	'''
@@ -178,8 +190,10 @@ def p_expressao_decl(p):
 
 	if len(p) == 3:
 		p[0] = x #p[1] + p[2]
+		p[0] = ('expressão-decl',p[1], p[2])
 	else:
 		p[0] = x #p[1]
+		p[0] = ('expressão-decl',p[1])
   
 def p_selecao_decl(p):
 	'''
@@ -193,8 +207,10 @@ def p_selecao_decl(p):
 		i=i+1 
 	if len(p) == 6:		
 		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5]
+		p[0] = ('seleção-decl',p[1], p[2], p[3], p[4], p[5])
 	else:
 		p[0] = x #p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7]
+		p[0] = ('seleção-decl',p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
 def p_iteracao_decl(p):
 	'''
@@ -359,8 +375,7 @@ def p_id(p):
 
 
 # Build the parser
-
-programa = open('testes/prg8.c-', 'r').read()
+programa = open('gcd.c-', 'r').read()
 """
 
 /* COMENTÁRIO */
@@ -389,6 +404,14 @@ programa =
 """
 
 lexer = regex.lexer
+
+# Nome do arquivo de entrada do lexer
+parametro = sys.argv[1]
+
+# Abre arquivo e armazena seu conteúdo na variável 'programa'
+arq = open(parametro,'r')
+programa = arq.read();
+
 lexer.input(programa)
 tokens = regex.tokens
 
@@ -401,7 +424,7 @@ try:
 except EOFError:
 	print("EOF")
 	pass
-
+arq.close();
 # while True:
 # 	try:
 # 		s = input('calc > ')
