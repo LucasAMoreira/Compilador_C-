@@ -20,7 +20,8 @@ tokens=[
 	'ID',
 	'NUM',
 	'RELOP',
-	'ARIOP', # Operador aritmético
+	'SUM', # Operador aritmético
+	'MULT',
 	'COMMENT',
 	'ATTRIBUTION',
 	'COMMA',
@@ -93,7 +94,24 @@ def t_RELOP(t):
 def t_COMMENT(t):	
 	r'(/\*){1}([^{/*}] | \*[^/] | /[^\*])*(\*/){1}'
 	pass
+
+def t_SUM(t):
+	r'\+ | \-'
+	if(t.value=='+'):
+		t.value = ['+','PLUS']
+	if(t.value=='-'):
+		t.value = ['-','MINUS']	
+	return t
+
+def t_MULT(t):
+	r'\* | /'
+	if(t.value=='*'):
+		t.value = ['*','TIMES']
+	if(t.value=='/'):
+		t.value = ['/','DIVIDE']
+	return t
 	
+"""	
 def t_ARIOP(t):
 	r'\+ | \- | \* | /'
 	if(t.value=='+'):
@@ -106,7 +124,7 @@ def t_ARIOP(t):
 		t.value = ['/','DIVIDE']
 	return t
 
-"""
+
 def t_PARENTHESES(t):
 	r'\( | \)'
 	if(t.value=='('):

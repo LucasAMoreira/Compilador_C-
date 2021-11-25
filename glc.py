@@ -6,7 +6,6 @@ import regex
 import warnings
 import sys
 
-AST = AST()
 
 def p_programa(p):
 	'programa : declaracao_lista'
@@ -277,15 +276,10 @@ def p_soma_expressao(p):
 		x = x + (i,)
 	p[0] = x
   
-def p_ariop(p):
-	'''
-	ariop : ARIOP
-	'''
-	p[0] = ('ariop', p[1])
  
 def p_soma(p):
 	'''
-	soma : ariop
+	soma : SUM
 	'''
 	p[0] = ('soma',p[1])
  
@@ -301,7 +295,7 @@ def p_termo(p):
   
 def p_mult(p):
 	'''
-	mult : ariop
+	mult : MULT
 	'''
 	p[0] = ('mult', p[1])
  
@@ -321,7 +315,7 @@ def p_fator(p):
 def p_ativacao(p):
 	'''
 	ativacao : ID OP args CP
-		    | ID OP CP
+		   
 	'''
 	x = ('ativacao',)
 	for i in p[1:]:
@@ -418,7 +412,7 @@ tokens = regex.tokens
 parser = yacc.yacc(debug=True)
 
 try:
-	teste = parser.parse(programa, lexer=lexer,debug=True)
+	teste = parser.parse(programa, lexer=lexer)
 	print(teste)
 	print("######################")
 except EOFError:
