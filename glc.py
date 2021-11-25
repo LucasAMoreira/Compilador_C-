@@ -2,10 +2,10 @@ import ply.yacc as yacc
 import ply.lex as lex
 # from regex import tokens
 import regex
-from AST import *
+# from AST import *
 import warnings
-
-AST = AST()
+# 
+# AST = AST()
 
 def p_programa(p):
 	'programa : declaracao_lista'
@@ -200,102 +200,94 @@ def p_iteracao_decl(p):
 	'''
 	iteracao_decl : WHILE OP expressao CP statement
 	'''
-	p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
+	x = ('iteracao_decl',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
  
 def p_retorno_decl(p):
 	'''
 	retorno_decl : RETURN SEMICOLON
 			   | RETURN expressao SEMICOLON
 	'''
-	x=[]
-	i=1
-	while(i<len(p)):
-		x.append(p[i])
-		i=i+1 
-	if len(p) == 3:
-		p[0] = x #p[1] + p[2]
-	else:
-		p[0] = x #p[1] + p[2] + p[3]
+	x = ('retorno_decl',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
 	
 def p_expressao(p):
 	'''
 	expressao : var ATTRIBUTION expressao
 			| simples_expressao
 	'''
-	x=[]
-	i=1
-	while(i<len(p)):
-		x.append(p[i])
-		i=i+1 
-
-	if len(p) == 4:
-		p[0] = x #p[1] + p[2] + p[3]
-	else:
-		p[0] = x #p[1]
+	x = ('expressao',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
   
 def p_var(p):
 	'''
 	var : ID
 	    | ID OBT expressao CBT
 	'''
-	if len(p) == 2:
-		p[0] = p[1]
-	else:
-		p[0] = p[1] + p[2] + p[3] + p[4]
+	x = ('var',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
   
 def p_simples_expressao(p):
 	'''
 	simples_expressao : soma_expressao relacional soma_expressao 
 				   | soma_expressao
 	'''
-	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
-	else:
-		p[0] = p[1]
+	x = ('simples_expressao',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
   
 def p_relacional(p):
 	'''
 	relacional : RELOP
 	'''
-	p[0] = p[1][0]
+	p[0] = ('relacional', p[1])
 			
 def p_soma_expressao(p):
 	'''
 	soma_expressao : soma_expressao soma termo
 				| termo
 	'''
-	if len(p) == 3:
-		p[0] = p[1] + p[2] + p[3]
-	else:
-		p[0] = p[1]
+	x = ('soma_expressao',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
   
 def p_ariop(p):
 	'''
 	ariop : ARIOP
 	'''
-	p[0] = p[1]
+	p[0] = ('ariop', p[1])
  
 def p_soma(p):
 	'''
 	soma : ariop
 	'''
-	p[0] = p[1]
+	p[0] = ('soma',p[1])
  
 def p_termo(p):
 	'''
 	termo : termo mult fator
 		 | fator
 	'''
-	if len(p) == 3:
-		p[0] = p[1] + p[2] + p[3]
-	else:
-		p[0] = p[1]
+	x = ('termo',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
   
 def p_mult(p):
 	'''
 	mult : ariop
 	'''
-	p[0] = p[1]
+	p[0] = ('mult', p[1])
  
 # MODIFICADO 
 def p_fator(p):
@@ -305,49 +297,38 @@ def p_fator(p):
 		 | ativacao
 		 | NUM
 	'''
-	if len(p) == 4:
-		p[0] = p[1] + p[2] + p[3]
-	else:
-		p[0] = p[1]
+	x = ('fator',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
      
 def p_ativacao(p):
 	'''
 	ativacao : ID OP args CP
 		    | ID OP CP
 	'''
-	x=[]
-	i=1
-	while(i<len(p)):
-		x.append(p[i])
-		i=i+1 
-
-	if(len(p)==5):
-		p[0] = x #p[1] + p[2] + p[3] + p[4]
-	else:
-		p[0] = x #p[1] + p[2] + p[3]
+	x = ('ativacao',)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
  
 def p_args(p):
 	'''
 	args : arg_lista 
 		| vazio
 	'''
-	p[0] = p[1]
+	p[0] = ('args', p[1])
  
 def p_arg_lista(p):
 	'''
 	arg_lista : arg_lista COMMA expressao
 			| expressao
 	'''
-	x=[]
-	i=1
-	while(i<len(p)):
-		x.append(p[i])
-		i=i+1 
-	if len(p) == 4:
-		p[0] = x#p[1] + p[2] + p[3]
-	else:
-		p[0] = x#p[1]
-		  
+	x = ("arg_lista",)
+	for i in p[1:]:
+		x = x + (i,)
+	p[0] = x
+
 def p_vazio(p):
 	'''
 	vazio :
@@ -378,7 +359,8 @@ def p_id(p):
 
 
 # Build the parser
-programa = open('sort.c-', 'r').read()
+
+programa = open('testes/prg8.c-', 'r').read()
 """
 
 /* COMENTÁRIO */
@@ -416,7 +398,6 @@ try:
 	teste = parser.parse(programa, lexer=lexer,debug=True)
 	print(teste)
 	print("######################")
-	print(raiz)
 except EOFError:
 	print("EOF")
 	pass
