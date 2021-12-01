@@ -75,19 +75,19 @@ def t_ID(t):
 	
 	
 def t_RELOP(t):
-	r'< | <= | > | >= | == | !='
-	if(t.value=='>'):
-		t.value=['>','GT']
-	if(t.value=='>='):
-		t.value=['>=','GE']
-	if(t.value=='<'):
-		t.value=['<','LT']
+	r'<= | >= | == | != | > | < '
 	if(t.value=='<='):
 		t.value=['<=','LE']
+	if(t.value=='>='):
+		t.value=['>=','GE']
 	if(t.value=='=='):
 		t.value=['==','EQ']
 	if(t.value=='!='):
 		t.value=['!=','NE']	
+	if(t.value=='<'):
+		t.value=['<','LT']
+	if(t.value=='>'):
+		t.value=['>','GT']
 	return t
 
 # DEVE estar antes de ARIOP
