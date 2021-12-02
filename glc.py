@@ -418,9 +418,42 @@ tokens = regex.tokens
 
 parser = yacc.yacc(debug=True)
 
+def printAST(ast):
+	ast=str(ast)
+	ast=ast.split()
+	i = j = flag = 0
+	for word in ast:
+		print(word)
+		'''
+		if('('in word):
+			print('\n'+' '*i+word, end='')
+			flag=1
+		else:
+			print(word+'\n'+(i-1)*' ', end='))')
+		'''
+		i=i+1
+		
+	'''
+	i=0
+	j=i
+	flag=0
+	for word in ast:
+		if('('in word):
+			print('\n'+' '*i+word, end='')
+			flag=1
+		else:
+			if(flag==1):
+				j=0
+				flag=0
+			print((j-1)*' '+word+'\n', end='')
+		i=i+1
+		j=i
+	'''
+
+
 try:
 	teste = parser.parse(programa, lexer=lexer, debug=True)
-	print(teste)
+	printAST(teste)
 	print("######################")
 except EOFError:
 	print("EOF")
