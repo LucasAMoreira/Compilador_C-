@@ -423,7 +423,12 @@ def printAST(ast):
 	ast=ast.split()
 	i = j = flag = 0
 	for word in ast:
-		print(word)
+		if('(' in word):
+			print('\n'+ ' '*i +word, end="")
+		else:
+			if(')' in word):
+				i=i-1
+			print(word, end="")
 		'''
 		if('('in word):
 			print('\n'+' '*i+word, end='')
@@ -452,7 +457,7 @@ def printAST(ast):
 
 
 try:
-	teste = parser.parse(programa, lexer=lexer, debug=True)
+	teste = parser.parse(programa, lexer=lexer)
 	printAST(teste)
 	print("######################")
 except EOFError:
