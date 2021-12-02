@@ -20,8 +20,10 @@ tokens=[
 	'ID',
 	'NUM',
 	'RELOP',
-	'SUM', # Operador aritmético
-	'MULT',
+	'PLUS', # Operador aritmético
+	'MINUS',
+	'TIMES',
+	'DIVIDE',
 	'COMMENT',
 	'ATTRIBUTION',
 	'COMMA',
@@ -49,7 +51,11 @@ t_ignore  = ' \t'# Ignora tabulação
 abre = r'/\*'	
 fecha = r'\*/'
 
-	
+t_PLUS = r'\+'
+t_MINUS = r'-'
+t_TIMES = r'\*'
+t_DIVIDE = r'/'
+
 t_OBT =r'\['
 t_CBT = r'\]'
 t_OP = r'\('
@@ -95,21 +101,21 @@ def t_COMMENT(t):
 	r'(/\*){1}([^{/*}] | \*[^/] | /[^\*])*(\*/){1}'
 	pass
 
-def t_SUM(t):
-	r'\+ | \-'
-	if(t.value=='+'):
-		t.value = ['+','PLUS']
-	if(t.value=='-'):
-		t.value = ['-','MINUS']	
-	return t
+# def t_SUM(t):
+# 	r'\+ | \-'
+# 	if(t.value=='+'):
+# 		t.value = ['+','PLUS']
+# 	if(t.value=='-'):
+# 		t.value = ['-','MINUS']	
+# 	return t
 
-def t_MULT(t):
-	r'\* | /'
-	if(t.value=='*'):
-		t.value = ['*','TIMES']
-	if(t.value=='/'):
-		t.value = ['/','DIVIDE']
-	return t
+# def t_MULT(t):
+# 	r'\* | /'
+# 	if(t.value=='*'):
+# 		t.value = ['*','TIMES']
+# 	if(t.value=='/'):
+# 		t.value = ['/','DIVIDE']
+# 	return t
 	
 """	
 def t_ARIOP(t):

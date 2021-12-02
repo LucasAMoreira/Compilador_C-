@@ -6,6 +6,10 @@ import regex
 import warnings
 import sys
 
+precedence = (
+    ('left','PLUS','MINUS'),
+    ('left','TIMES','DIVIDE'),
+    )
 
 def p_programa(p):
 	'programa : declaracao_lista'
@@ -279,7 +283,8 @@ def p_soma_expressao(p):
  
 def p_soma(p):
 	'''
-	soma : SUM
+	soma : PLUS
+		| MINUS
 	'''
 	p[0] = ('soma',p[1])
  
@@ -295,7 +300,8 @@ def p_termo(p):
   
 def p_mult(p):
 	'''
-	mult : MULT
+	mult : TIMES
+		| DIVIDE
 	'''
 	p[0] = ('mult', p[1])
  
@@ -306,6 +312,7 @@ def p_fator(p):
 		 | var
 		 | ativacao
 		 | NUM
+		 | soma NUM
 	'''
 	x = ('fator',)
 	for i in p[1:]:
@@ -412,7 +419,7 @@ tokens = regex.tokens
 parser = yacc.yacc(debug=True)
 
 try:
-	teste = parser.parse(programa, lexer=lexer)
+	teste = parser.parse(programa, lexer=lexer, debug=True)
 	print(teste)
 	print("######################")
 except EOFError:
