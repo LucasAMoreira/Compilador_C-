@@ -279,7 +279,6 @@ def p_vazio(p):
 	'''
 	pass
 
-
 def p_error(p):
 	if p:
 		print("Erro sintático na linha %d" % p.lineno)
@@ -288,4 +287,3 @@ def p_error(p):
 
 tokens = regex.tokens
 parser = yacc.yacc(debug=True)
-

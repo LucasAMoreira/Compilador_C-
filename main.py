@@ -2,10 +2,20 @@ import ply.yacc as yacc
 import ply.lex as lex
 import regex
 import glc
+import astree
 from AST import *
 import sys
 
-
+def build_tree(tokens):
+	if tokens:
+		if type(tokens) == str:
+			root = astree.TreeNode(tokens)
+			return root
+		root = astree.TreeNode(tokens[0])
+		for token in tokens[1:]:
+			root.add_child(build_tree(token))
+		return root
+	return None
 # Cria lexer com base nas expressões regulares do arquivo regex.py
 # NÃO ativamos o modo 'optmize', pois com ele não podemos identificar qual é a linha
 lexer = regex.lexer
@@ -31,6 +41,7 @@ else:
 	try:
 		teste = parser.parse(programa, lexer=lexer)
 		print(teste)
+		tree = build_tree(teste)
 		#teste = ('raiz',('filho',('neto1','neto2','neto3')))
 		#teste2=('irmao1','irmao2')
 		#ast = criaAST(teste)
@@ -46,7 +57,7 @@ else:
 		print(arg1)
 		print(arg2)
 		print(result)
-		
+		tree.print_tree()
 	except EOFError:
 		print("EOF")
 		pass
