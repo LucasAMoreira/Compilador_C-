@@ -454,12 +454,28 @@ def printAST(ast):
 		i=i+1
 		j=i
 	'''
+import astree
 
+def build_tree(tokens):
+	if tokens:
+		if type(tokens) == str:
+			root = astree.TreeNode(tokens)
+			return root
+		root = astree.TreeNode(tokens[0])
+		for token in tokens[1:]:
+			print('AAAAA', type(token),token)
+			root.add_child(build_tree(token))
+			# node = astree.TreeNode(token[0])
+			# root.add_child(node)
+		return root
 
 try:
 	teste = parser.parse(programa, lexer=lexer)
 	printAST(teste)
+	tree = build_tree(teste)
 	print("######################")
+	breakpoint()
+	# tree.print_tree()
 except EOFError:
 	print("EOF")
 	pass
