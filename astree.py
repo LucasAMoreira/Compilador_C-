@@ -1,5 +1,3 @@
-#class for abstract syntax trees
-
 class TreeNode:
     def __init__(self, data):
         self.parent = None
@@ -20,13 +18,12 @@ class TreeNode:
         return level
     
     def print_tree(self):
-        spaces = ' ' * self.get_level()
-        
-        print(spaces + self.data)
+        spaces = ' ' * self.get_level() * 3
+        prefix = spaces + '|__' if self.parent else ''
+        print(prefix + self.data)
         if self.children:
             for child in self.children:
                 child.print_tree()
             
-        
     def __repr__(self):
         return self.data
