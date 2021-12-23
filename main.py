@@ -46,7 +46,11 @@ else:
 		#print("######################")
 		tree = substitute(tree)
 		tree.print_tree()
-		decl = addTemp(tree)
+		decl = retornaOp(tree)
+		#print(decl)
+		decl = retornaSep(decl)
+		decl = inverte(decl)
+		decl = addTemp(decl)
 		print(decl)
 		
 	except EOFError:
