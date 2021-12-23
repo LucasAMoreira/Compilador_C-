@@ -95,25 +95,53 @@ def separa(lista):
 	resposta=[]
 	for c in lista:
 		r=[]
+		l=[]
 		i=0
 		while i<len(c):
 			if(c[i]!=';'):
 				r.append(c[i])
 			else:
-				resposta.append(r)
+				l.append(r)
 				r=[]
-			
 			i+=1
+		resposta.append(l)
+					
 	return resposta
+
+def ordena(lista):
+	resposta=[]
+	# Para cada lista de listas
+	for c in lista:
+		r=[]
+		l=[]	
+		i=len(c)-1
+		while i>=0:
+			r.append(c[i])
+			i-=1
+		l.append(r)
+		resposta.append(l)
+			
+	return resposta	
 
 def padding(lista):
 	resposta=[]
-	for c in lista:
-		r=c
-		i=0
-		while len(r)<4:
-			r.insert(1,'$')
-		resposta.append(r)
+	for d in lista:
+		l=[]
+		for c in d:
+			r=c
+			i=0
+			while len(r)<4:
+				r.insert(1,'$')
+			l.append(r)
+		resposta.append(l)
+	return resposta
+
+def simplifica(lista):
+	resposta=[]
+	for d in lista:
+		for c in d:
+			for b in c:
+				resposta.append(b)
 	return resposta
 
 def conta(lista):
@@ -153,6 +181,8 @@ def addTemp(lista):
 			j+=1
 		resposta.append(r)
 	return resposta
+
+
 
 def criaQuad(lista):
 	res=[]

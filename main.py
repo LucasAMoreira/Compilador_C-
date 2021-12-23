@@ -51,13 +51,15 @@ else:
 		decl = retornaSep(decl)
 		decl = inverte(decl)
 		decl = divide(decl)
-		decl = separa(decl)
+		decl = separa(decl)		
 		decl = padding(decl)
+		decl = ordena(decl)
+		decl = simplifica(decl)
 		decl = addTemp(decl)
 		
-		for d in decl:
-			d = " ".join(d)
-			print(d, end=";\n")
+		#for d in decl:
+		#	d = " ".join(d)
+		#	print(d, end=";\n")
 		
 		
 		print(decl)
