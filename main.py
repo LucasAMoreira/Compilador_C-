@@ -50,7 +50,9 @@ else:
 		#print(decl)
 		decl = retornaSep(decl)
 		decl = inverte(decl)
-		decl = addTemp(decl)
+		decl = divide(decl)
+		decl = separa(decl)
+		decl = padding(decl)
 		print(decl)
 		
 	except EOFError:

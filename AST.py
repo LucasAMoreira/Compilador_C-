@@ -1,3 +1,5 @@
+import Quad
+
 def retornaTriplas(tupla):
 	x=''
 	for t in tupla:
@@ -73,8 +75,56 @@ def inverte(comandos):
 		resposta.append(r)
 	return resposta
 
+def divide(lista):
+	resposta=[]
+	for c in lista:
+		r=[]
+		i=0
+		while i<len(c)-1:
+			r.append(c[i])				
+			if(c[i+1]=='ADD' or c[i+1]=='LOAD' ):
+				r.append(';')
+			i+=1
+			if(i==len(c)-1):
+				r.append(c[i])
+				r.append(';')
+		resposta.append(r)
+	return resposta
 
-def addTemp(lista):
+def separa(lista):
+	resposta=[]
+	for c in lista:
+		r=[]
+		i=0
+		while i<len(c):
+			if(c[i]!=';'):
+				r.append(c[i])
+				print(c[i])
+			else:
+				r=[]
+			resposta.append(r)
+			i+=1
+	return resposta
+
+def padding(lista):
+	resposta=[]
+	for c in lista:
+		r=c
+		i=0
+		while len(r)<4:
+			r.insert(1,'$')
+		resposta.append(r)
+	return resposta
+
+def criaQuad(lista):
+	res=[]
+	arg1=[]
+	arg2=[]
+	op=[]
+	
+	quad = Quad(op.arg1,arg2,result)
+	
+	
 	res = []
 	for l in lista:
 		i=2
