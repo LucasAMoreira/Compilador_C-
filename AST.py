@@ -99,10 +99,10 @@ def separa(lista):
 		while i<len(c):
 			if(c[i]!=';'):
 				r.append(c[i])
-				print(c[i])
 			else:
+				resposta.append(r)
 				r=[]
-			resposta.append(r)
+			
 			i+=1
 	return resposta
 
@@ -113,6 +113,44 @@ def padding(lista):
 		i=0
 		while len(r)<4:
 			r.insert(1,'$')
+		resposta.append(r)
+	return resposta
+
+def conta(lista):
+	resposta=0
+	for c in lista:
+		i=0
+		while i<len(c):
+			if(c[i]=='LOAD'):
+				resposta +=1;
+				break
+			if(c[i]=='$'):
+				resposta +=1	
+			i+=1		
+	return resposta
+
+def addTemp(lista):
+
+	resposta =[]
+	t=conta(lista)
+	temp = []
+	i=0
+	while i<t:
+		temp.append('$t'+str(i))
+		temp.append('$t'+str(i))
+		i+=1
+	j=0
+	for c in lista:
+		r=c
+		i=0
+		while i<len(c):
+			if(c[i]=='LOAD'):
+				r[i+1]=temp[j]				
+				break
+			if(c[i]=='$'):
+				r[i]=temp[j]
+			i+=1		
+			j+=1
 		resposta.append(r)
 	return resposta
 

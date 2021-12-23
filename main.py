@@ -53,6 +53,13 @@ else:
 		decl = divide(decl)
 		decl = separa(decl)
 		decl = padding(decl)
+		decl = addTemp(decl)
+		
+		for d in decl:
+			d = " ".join(d)
+			print(d, end=";\n")
+		
+		
 		print(decl)
 		
 	except EOFError:
