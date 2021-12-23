@@ -182,6 +182,12 @@ def addTemp(lista):
 		resposta.append(r)
 	return resposta
 
+def geraCod(lista):
+	for d in lista:
+		if '$' in d:
+			d.remove('$')
+		d = " ".join(d)
+		print(d, end=";\n")
 
 
 def criaQuad(lista):

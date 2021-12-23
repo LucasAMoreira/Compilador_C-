@@ -45,7 +45,7 @@ else:
 		#tree.print_tree()
 		#print("######################")
 		tree = substitute(tree)
-		tree.print_tree()
+		#tree.print_tree()
 		decl = retornaOp(tree)
 		#print(decl)
 		decl = retornaSep(decl)
@@ -56,7 +56,7 @@ else:
 		decl = ordena(decl)
 		decl = simplifica(decl)
 		decl = addTemp(decl)
-		
+		#geraCod(decl)
 		#for d in decl:
 		#	d = " ".join(d)
 		#	print(d, end=";\n")
