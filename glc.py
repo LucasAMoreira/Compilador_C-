@@ -18,10 +18,8 @@ def p_declaracao_lista(p):
 				| declaracao
 	'''
 	if len(p) == 3:
-		p[0] = p[1] + p[2]
 		p[0] = ('declaração-lista',p[1],p[2])
 	else:
-		p[0] = p[1]
 		p[0] = ('declaração-lista',p[1])
  
 def p_declaracao(p):
@@ -29,7 +27,6 @@ def p_declaracao(p):
 	declaracao : var_declaracao
 			| fun_declaracao
 	'''
-	p[0] = p[1]
 	p[0] = ('declaração',p[1])
  
 def p_var_declaracao(p):
@@ -40,7 +37,7 @@ def p_var_declaracao(p):
 	if len(p) == 4:
 		p[0] = ('var-declaração',p[1],p[2],p[3])
 	else:
-		p[0] = ('var-declaração',p[1],p[2],p[3])
+		p[0] = ('var-declaração',p[1],p[2],p[3],p[4],p[5],p[6])
   
 def p_tipo_especificador(p):
 	'''

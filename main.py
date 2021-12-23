@@ -16,6 +16,7 @@ def build_tree(tokens):
 			root.add_child(build_tree(token))
 		return root
 	return None
+	
 # Cria lexer com base nas expressões regulares do arquivo regex.py
 # NÃO ativamos o modo 'optmize', pois com ele não podemos identificar qual é a linha
 lexer = regex.lexer
@@ -40,24 +41,14 @@ else:
 
 	try:
 		teste = parser.parse(programa, lexer=lexer)
-		print(teste)
 		tree = build_tree(teste)
-		#teste = ('raiz',('filho',('neto1','neto2','neto3')))
-		#teste2=('irmao1','irmao2')
-		#ast = criaAST(teste)
-		#printAST(ast)
-		arg1 = []
-		arg2 = []
-		op = []
-		result = []
-		percorre(teste,op,arg1,arg2)
-		#quadPreLoad(op,arg1,arg2,result)
-		#quadSoma(op,arg1,arg2,result)
-		print(op)
-		print(arg1)
-		print(arg2)
-		print(result)
+		#tree.print_tree()
+		#print("######################")
+		tree = substitute(tree)
 		tree.print_tree()
+		decl = addTemp(tree)
+		print(decl)
+		
 	except EOFError:
 		print("EOF")
 		pass
