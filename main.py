@@ -17,6 +17,8 @@ def build_tree(tokens):
 		return root
 	return None
 	
+
+	
 # Cria lexer com base nas expressões regulares do arquivo regex.py
 # NÃO ativamos o modo 'optmize', pois com ele não podemos identificar qual é a linha
 lexer = regex.lexer
@@ -42,12 +44,15 @@ else:
 	try:
 		teste = parser.parse(programa, lexer=lexer)
 		tree = build_tree(teste)
-		#tree.print_tree()
-		#print("######################")
-		tree = substitute(tree)
-		#tree.print_tree()
-		decl = retornaOp(tree)
+		tree.print_tree()
+		print("######################")
+		#tree = substitute(tree)
+		tree = simple_ast(tree)
+		tree = t_traduz(tree)
+		tree.print_tree()
+		#decl = retornaOp(tree)
 		#print(decl)
+		'''
 		decl = retornaSep(decl)
 		decl = inverte(decl)
 		decl = divide(decl)
@@ -56,13 +61,14 @@ else:
 		decl = ordena(decl)
 		decl = simplifica(decl)
 		decl = addTemp(decl)
+		'''
 		#geraCod(decl)
 		#for d in decl:
 		#	d = " ".join(d)
 		#	print(d, end=";\n")
 		
 		
-		print(decl)
+		#print(decl)
 		
 	except EOFError:
 		print("EOF")

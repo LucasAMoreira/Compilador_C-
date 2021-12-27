@@ -1,4 +1,12 @@
 import Quad
+from traducao import *
+from astree import *
+from simple import *
+	
+	
+# ================================================ 	
+
+	
 
 def retornaTriplas(tupla):
 	x=''
@@ -136,6 +144,7 @@ def padding(lista):
 		resposta.append(l)
 	return resposta
 
+'''
 def simplifica(lista):
 	resposta=[]
 	for d in lista:
@@ -143,7 +152,7 @@ def simplifica(lista):
 			for b in c:
 				resposta.append(b)
 	return resposta
-
+'''
 def conta(lista):
 	resposta=0
 	for c in lista:
