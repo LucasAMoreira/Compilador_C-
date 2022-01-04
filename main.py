@@ -47,9 +47,9 @@ else:
 		tree.print_tree()
 		print("######################")
 		#tree = substitute(tree)
-		tree = simple_ast(tree)
+		#tree = simple_ast(tree)
 		tree = t_traduz(tree)
-		tree.print_tree()
+		#tree.print_tree()
 		#decl = retornaOp(tree)
 		#print(decl)
 		'''

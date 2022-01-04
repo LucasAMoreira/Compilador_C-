@@ -10,32 +10,32 @@
 # Caso o nó seja 'soma_expressao' invoca o método t_tranlate
 def t_traduz(root):
 	if root:
-		if(root.data == 'soma_expressao'):	
+		if(root.data == 'return'):
+			t_return(root)
+		elif(root.data == 'expressao'):	
 			t_translate(root)
-		if(root.data == 'fun-declaração'):
+		elif(root.data == 'fun-declaração'):
 			t_function(root)
+		elif(root.data == 'seleção-decl'):
+			t_if(root)
+		
 		for child in root.children:
 			t_traduz(child)			
 	return root
 
-# Retorna OPERAÇÃO (não os números ou ids)
-def get_operation(root):
+# Recebe nó com 'return' e gera código 'jr $ra'
+def t_return(root):
+	res = []
+	res.insert(0,'jr')
+	res.insert(1,'$ra')
+	gera_codigo(res)
 
-	for child in root.children:
-		if(child.data != 'soma_expressao'):			
-			if child.data == '=':
-				return('LOAD')
-			if child.data == '+':
-				return('ADD')
-			if child.data == '*':
-				return('MULT')
-			if child.data == '/':
-				return('DIV')
+
 
 # Gera código em linguagem intermediária			
 def t_translate(root):
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
-	if root.data == 'soma_expressao':
+	if root.data == 'expressao':
 		root.data = 'VISITADO'
 	
 	# Armazenamos em res o comando em linguagem intermediária
@@ -59,16 +59,12 @@ def t_translate(root):
 		elif child.data == '/':
 			res.insert(0,'div')
 		elif child.data =='while':
-			res.insert(0,'while:')				
-		elif child.data == 'soma_expressao':
+			res.insert(0,'while:')	
+		elif child.data == 'return':
+			res.insert(0, 'jr $ra')			
+		elif child.data == 'expressao':
 			registrador2 = t_translate(child)
 		elif len(root.children) == 1:
-			'''
-			res.append('add')
-			res.append(['li','$t'+str(i),child.data])
-			res.append('$zero')			
-			registrador = '$t2'
-			'''
 			res.append('li')
 			res.append('$t'+str(i))
 			res.append(child.data)
@@ -88,6 +84,32 @@ def t_translate(root):
 	#print(res)		
 	return registrador
 	
+
+def t_if(root):
+	# Marca nós visitados para eles não serem visitados novamente por t_traduz
+	if root.data == 'expressao':
+		root.data = 'VISITADO'
+	
+	tem_else = True
+	
+	res = []
+	
+	# Percorre árvore e armazena em res o código intermediário
+	if(root.data == 'simples-decl'):
+		for child in root.children:
+			if child.data == 'else':
+				tem_else = True
+			else:
+				tem_else = False
+			
+	if tem_else:
+		for child in root.children:	
+			if child.data == 'EQ':
+				res.insert(0,'bne')	
+			elif child.children != []:
+				t_if(child)
+	
+	gera_codigo(res)	
 	
 def t_function(root):
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
