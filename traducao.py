@@ -6,12 +6,18 @@
 # =======================================================
 
 global args
+global var
 global sp
+
 args = []
+var = []
 sp=0
 
 global comando
 comando = []
+
+global aux
+aux = []
 
 # Percorre AST
 # Caso o nó seja 'soma_expressao' invoca o método t_tranlate
@@ -19,14 +25,22 @@ def t_traduz(root):
 	if root:
 		if(root.data == 'ativacao'):
 			t_ativacao(root)
-		elif(root.data == 'retorno_decl'):
+		elif(root.data == 'expressão-decl'):			
+			t_expr_decl(root)
+			gera_codigo(comando)
+			comando.clear()
+		elif(root.data == 'retorno_decl'):			
 			t_retorno_decl(root)
+			comando.clear()
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
-		elif(root.data == 'expressao'):	
+		elif(root.data == 'expressao'):				
 			t_expr(root)
+		elif(root.data == 'local-declarações'):
+			get_vars(root)
 		elif(root.data == 'seleção-decl'):
 			t_if(root)
+			comando.clear()
 		elif(root.data == 'params'):
 			t_params(root)
 			get_params(root)
@@ -34,6 +48,44 @@ def t_traduz(root):
 		for child in root.children:
 			t_traduz(child)			
 	return root
+
+def var_count(root):	
+	n_var = 0
+	if root.data=='var-declaração':
+		return 1
+		
+	for child in root.children:
+		n_var += var_count(child)	
+	return n_var
+
+def get_vars(root):	
+	if root.data=='var-declaração':
+		for child in root.children:
+			if child.children == [] and child.data != ';':
+				var.append(child.data)
+									
+	for child in root.children:
+		get_vars(child)
+
+
+def t_expr_decl(root):
+	
+	if root.data == 'expressão-decl':
+		root.data = 'VISITADO'
+	
+	if root.data.isnumeric():
+		comando.insert(0,'li')
+		comando.append(root.data)
+		
+	if root.data in var:
+		index = var.index(root.data)
+		comando.insert(1,'$s'+str(index))
+				
+	for child in root.children:
+		t_expr_decl(child)
+	return comando
+
+	
 
 # Recebe qualquer nó e gera código 'jr $ra'
 def t_return(root):
@@ -59,11 +111,14 @@ def t_retorno_decl(root):
 		# Se retorna um dos argumentos recebidos
 		if(root.data in args):
 			index = args.index(root.data)
-			res.insert(0,'move')
-			res.insert(1,'$v0')
-			res.insert(2,'$a'+str(index))
+			aux.insert(0,'move')
+			aux.insert(1,'$v0')
+			aux.insert(2,'$a'+str(index))
+			return aux
+	'''
 	if(root.data == 'expressao'):
 		retorno = True
+	'''
 	'''
 	if(root.data == 'expressao'):
 		retorno = True
@@ -78,13 +133,10 @@ def t_retorno_decl(root):
 	for child in root.children:
 		t_retorno_decl(child)
 		
-	gera_codigo(res)
+	#gera_codigo(res)
+	return aux	
 	
-	
-	
-	if retorno:
-		restaura_sp()
-		t_return(root)
+		
 	
 	
 # Gera código MIPS para IF
@@ -94,10 +146,13 @@ def t_if(root):
 	res = []
 
 	if root.data == 'expressao':
-		comando = []
 		res=t_expr(root)
 	elif(root.data == 'retorno_decl'):
-		t_retorno_decl(root)
+		res=t_retorno_decl(root)
+		gera_codigo(res)
+		restaura_sp()
+		t_return(root)
+		aux.clear()
 	elif(root.data == 'else'):
 		res.append('else:')
 	for child in root.children:	
@@ -134,8 +189,7 @@ def get_params(root):
 		for child in root.children:
 			if child.children == []:
 				args.append(child.data)
-				
-					
+									
 	for child in root.children:
 		param = get_params(child)
 		
@@ -184,8 +238,14 @@ def t_expr(root):
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
 	if root.data == 'expressao':
 		root.data = 'VISITADO'
-
-	if root.data == 'EQ':
+	
+	if root.data == '+':
+		comando.insert(0,'add')		
+	elif root.data == '*':
+		comando.insert(0,'mul')
+	elif root.data == '/':
+		comando.insert(0,'div')
+	elif root.data == 'EQ':
 		comando.insert(0,'bne')	
 	elif(root.data == 'NE'):
 		comando.insert(0,'beq')
@@ -200,6 +260,11 @@ def t_expr(root):
 		t_expr(child)
 				
 	return comando	
+		
+		
+		
+		
+		
 		
 
 
