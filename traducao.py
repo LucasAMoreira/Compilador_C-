@@ -6,7 +6,12 @@
 # =======================================================
 
 global args
+global sp
 args = []
+sp=0
+
+global comando
+comando = []
 
 # Percorre AST
 # Caso o nó seja 'soma_expressao' invoca o método t_tranlate
@@ -19,7 +24,7 @@ def t_traduz(root):
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
 		elif(root.data == 'expressao'):	
-			t_expressao(root)
+			t_expr(root)
 		elif(root.data == 'seleção-decl'):
 			t_if(root)
 		elif(root.data == 'params'):
@@ -37,10 +42,29 @@ def t_return(root):
 	res.insert(1,'$ra')		
 	gera_codigo(res)
 	
+def restaura_sp():
+	res = []
+	res.insert(0,'addi')
+	res.insert(1,'$sp')
+	res.insert(2,'$sp')
+	res.insert(3,str(-1*sp))
+	gera_codigo(res)
+	
 # Recebe retorno_decl e gera código 'move $v0, $aX	'
 def t_retorno_decl(root):
 	res = []	
 	retorno = False
+	
+	if(root.children == [] and root.data != 'return'):
+		# Se retorna um dos argumentos recebidos
+		if(root.data in args):
+			index = args.index(root.data)
+			res.insert(0,'move')
+			res.insert(1,'$v0')
+			res.insert(2,'$a'+str(index))
+	if(root.data == 'expressao'):
+		retorno = True
+	'''
 	if(root.data == 'expressao'):
 		retorno = True
 		for child in root.children:
@@ -50,11 +74,16 @@ def t_retorno_decl(root):
 				res.insert(0,'move')
 				res.insert(1,'$v0')
 				res.insert(2,'$a'+str(index))
-				
+	'''			
 	for child in root.children:
 		t_retorno_decl(child)
+		
 	gera_codigo(res)
+	
+	
+	
 	if retorno:
+		restaura_sp()
 		t_return(root)
 	
 	
@@ -63,30 +92,27 @@ def t_if(root):
 
 	# Resposta
 	res = []
-	
-	if(root.data == 'EQ'):
-		return 'bne'		
-	elif(root.data == 'NE'):
-		return 'beq'
-	elif(root.data == 'else'):
-		res.append('else')
-	elif(root.data == '0'):
-		return '$zero'		
-	elif(root.data in args):
-		indice = args.index(root.data)
-		return '$a'+str(indice)
+
+	if root.data == 'expressao':
+		comando = []
+		res=t_expr(root)
 	elif(root.data == 'retorno_decl'):
 		t_retorno_decl(root)
+	elif(root.data == 'else'):
+		res.append('else:')
 	for child in root.children:	
-		valor = t_if(child)
+		t_if(child)
+		'''
 		if valor:
 			if valor == 'bne' or valor == 'beq':
 				res.insert(0,t_if(child))
 			else:
 				res.append(t_if(child))
-			if('else' not in res and len(res)==3):
-				res.append('else')	
-	gera_codigo(res)
+		'''
+		if('else' not in res and len(res)==3):
+			res.append('else')	
+	if(len(res)>1 and len(res)<5)or 'else:' in res:
+		gera_codigo(res)
 	
 # Recebe um nó 'fun_declaração' e gera rótulo MIPS
 # EX: 'funcao()' -> 'funcao:'
@@ -131,6 +157,7 @@ def t_params(root):
 	# Se é um método void não faz nada
 	if params > 0:
 		# Salva novo topo da pilha
+		global sp
 		sp = (params*-4)-4
 		res.insert(0,'addi')
 		res.append('$sp')
@@ -151,6 +178,32 @@ def t_params(root):
 			i-=4
 			j+=1
 		
+
+# EM DESENVOLVIMENTO Gera código em linguagem intermediária			
+def t_expr(root):
+	# Marca nós visitados para eles não serem visitados novamente por t_traduz
+	if root.data == 'expressao':
+		root.data = 'VISITADO'
+
+	if root.data == 'EQ':
+		comando.insert(0,'bne')	
+	elif(root.data == 'NE'):
+		comando.insert(0,'beq')
+	elif root.data == '0':
+		comando.append('$zero')
+	elif(root.data in args):		
+		indice = args.index(root.data)
+		comando.append('$a'+str(indice))				
+
+	# Percorre a árvore 
+	for child in root.children:		
+		t_expr(child)
+				
+	return comando	
+		
+
+
+
 		
 
 # EM DESENVOLVIMENTO Gera código em linguagem intermediária			
