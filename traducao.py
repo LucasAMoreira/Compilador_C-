@@ -38,16 +38,27 @@ def t_traduz(root):
 			t_expr(root)
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
+		
 		elif(root.data == 'seleção-decl'):
 			t_if(root)
 			comando.clear()
 		elif(root.data == 'params'):
 			t_params(root)
 			get_params(root)
-
+		elif(root.data == 'args'):
+			t_args(root)
+			
 		for child in root.children:
 			t_traduz(child)			
 	return root
+
+
+def t_args(root):
+	if(root.data in args):
+		print('Tô aqui')
+	for child in root.children:
+		t_args(child)
+
 
 def var_count(root):	
 	n_var = 0
@@ -107,6 +118,10 @@ def t_retorno_decl(root):
 	res = []	
 	retorno = False
 	
+	#if root.data == 'expressao':
+	#	print('EXPR')
+	#	aux=t_expr(root)
+	
 	if(root.children == [] and root.data != 'return'):
 		# Se retorna um dos argumentos recebidos
 		if(root.data in args):
@@ -147,9 +162,11 @@ def t_if(root):
 
 	if root.data == 'expressao':
 		res=t_expr(root)
+		
 	elif(root.data == 'retorno_decl'):
 		res=t_retorno_decl(root)
-		gera_codigo(res)
+		if(len(res)>1 and len(res)<5)or 'else:' in res:
+			gera_codigo(res)
 		restaura_sp()
 		t_return(root)
 		aux.clear()
@@ -239,16 +256,41 @@ def t_expr(root):
 	if root.data == 'expressao':
 		root.data = 'VISITADO'
 	
+	if root.data == 'EQ':
+		comando.insert(0,'bne')	
+	elif(root.data == 'NE'):	
+		comando.insert(0,'beq')
+	elif root.data == '0':
+		comando.append('$zero')
+	elif(root.data in args):		
+		indice = args.index(root.data)
+		comando.append('$a'+str(indice))				
+	elif root.data in ['+','-','*','/']:
+		res=t_expressao(root)
+	#Percorre a árvore 
+	for child in root.children:		
+		t_expr(child)
+				
+	return comando	
+		
+def t_expressao(root):
+	# Marca nós visitados para eles não serem visitados novamente por t_traduz
+	if root.data == 'expressao':
+		root.data = 'VISITADO'
+	
 	if root.data == '+':
-		comando.insert(0,'add')		
+		comando.insert(0,'add')
+	elif root.data == '-':
+		comando.clear()
+		comando.insert(0,'sub')
+		print(comando)	
 	elif root.data == '*':
+		comando.clear()
 		comando.insert(0,'mul')
 	elif root.data == '/':
+		comando.clear()
 		comando.insert(0,'div')
-	elif root.data == 'EQ':
-		comando.insert(0,'bne')	
-	elif(root.data == 'NE'):
-		comando.insert(0,'beq')
+		print(comando)
 	elif root.data == '0':
 		comando.append('$zero')
 	elif(root.data in args):		
@@ -262,52 +304,6 @@ def t_expr(root):
 	return comando	
 		
 		
-		
-		
-		
-		
-
-
-
-		
-
-# EM DESENVOLVIMENTO Gera código em linguagem intermediária			
-def t_expressao(root):
-	# Marca nós visitados para eles não serem visitados novamente por t_traduz
-	if root.data == 'expressao':
-		root.data = 'VISITADO'
-	
-	# Armazenamos em res o comando em linguagem intermediária
-	res = []
-	registrador = None
-	registrador2  = None
-	i=0;# adicionado 27/12
-
-	# Percorre árvore e armazena em res o código intermediário
-	for child in root.children:	
-
-		if root.data == '/':
-			print('DIV')
-			res.insert(0,'div')		
-		elif root.data.isnumeric():
-			res.append(['li', '$s'+str(i),root.data])
-			i+=1# adicionado 27/12
-			#res.append(child.data)
-			#registrador = '$t'+str(i)	
-		t_expressao(child)
-			
-		
-	if registrador2 != None:
-		res.append(registrador2)
-	if registrador != None:
-		res.insert(1,registrador)
-	
-	gera_codigo(res)	
-	#print(res)		
-	return registrador
-
-
-
 # Gera código MIPS para invocação de funções
 def t_ativacao(root):
 	
@@ -360,6 +356,14 @@ def gera_codigo(codigo):
 		print()
 		
 
-	
+def get_operation(root):
+	if(root.data in ['+','-','/','*']):
+		print('É TRUEEEEEEEE')
+		is_arit = True
+	elif(root.data in ['EQ','NE']):
+		is_arit= False
+	for child in root.children:
+		is_arit=get_operation(child)
+	return is_arit
 	
 	
