@@ -5,6 +5,8 @@
 #
 # =======================================================
 
+global args
+args = []
 
 # Percorre AST
 # Caso o nó seja 'soma_expressao' invoca o método t_tranlate
@@ -12,8 +14,8 @@ def t_traduz(root):
 	if root:
 		if(root.data == 'ativacao'):
 			t_ativacao(root)
-		elif(root.data == 'return'):
-			t_return(root)
+		elif(root.data == 'retorno_decl'):
+			t_retorno_decl(root)
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
 		elif(root.data == 'expressao'):	
@@ -22,18 +24,70 @@ def t_traduz(root):
 			t_if(root)
 		elif(root.data == 'params'):
 			t_params(root)
+			get_params(root)
 
 		for child in root.children:
 			t_traduz(child)			
 	return root
 
-# Recebe nó com 'return' e gera código 'jr $ra'
+# Recebe qualquer nó e gera código 'jr $ra'
 def t_return(root):
-	res = []
+	res = []			
 	res.insert(0,'jr')
-	res.insert(1,'$ra')
+	res.insert(1,'$ra')		
 	gera_codigo(res)
+	
+# Recebe retorno_decl e gera código 'move $v0, $aX	'
+def t_retorno_decl(root):
+	res = []	
+	retorno = False
+	if(root.data == 'expressao'):
+		retorno = True
+		for child in root.children:
+			
+			if(child.data in args):
+				index = args.index(child.data)
+				res.insert(0,'move')
+				res.insert(1,'$v0')
+				res.insert(2,'$a'+str(index))
+				
+	for child in root.children:
+		t_retorno_decl(child)
+	gera_codigo(res)
+	if retorno:
+		t_return(root)
+	
+	
+# Gera código MIPS para IF
+def t_if(root):
 
+	# Resposta
+	res = []
+	
+	if(root.data == 'EQ'):
+		return 'bne'		
+	elif(root.data == 'NE'):
+		return 'beq'
+	elif(root.data == 'else'):
+		res.append('else')
+	elif(root.data == '0'):
+		return '$zero'		
+	elif(root.data in args):
+		indice = args.index(root.data)
+		return '$a'+str(indice)
+	elif(root.data == 'retorno_decl'):
+		t_retorno_decl(root)
+	for child in root.children:	
+		valor = t_if(child)
+		if valor:
+			if valor == 'bne' or valor == 'beq':
+				res.insert(0,t_if(child))
+			else:
+				res.append(t_if(child))
+			if('else' not in res and len(res)==3):
+				res.append('else')	
+	gera_codigo(res)
+	
 # Recebe um nó 'fun_declaração' e gera rótulo MIPS
 # EX: 'funcao()' -> 'funcao:'
 def t_function(root):	
@@ -48,6 +102,17 @@ def t_function(root):
 	
 	gera_codigo(res)
 
+def get_params(root):
+	
+	if root.data=='param':
+		for child in root.children:
+			if child.children == []:
+				args.append(child.data)
+				
+					
+	for child in root.children:
+		param = get_params(child)
+		
 
 # Retorna número de parâmetros de uma função
 def params_count(root):	
@@ -63,13 +128,16 @@ def params_count(root):
 def t_params(root):
 	params = params_count(root)
 	res = []
+	# Se é um método void não faz nada
 	if params > 0:
+		# Salva novo topo da pilha
 		sp = (params*-4)-4
 		res.insert(0,'addi')
 		res.append('$sp')
 		res.append('$sp')
 		res.append(sp)
 		gera_codigo(res)
+		# Salva registradores na moldura
 		i=-1*(sp+4)
 		j = 0
 		register = '$ra'
@@ -122,34 +190,6 @@ def t_expressao(root):
 
 
 
-
-# Gera código MIPS de IF
-def t_if(root):
-	# Marca nós visitados para eles não serem visitados novamente por t_traduz
-	if root.data == 'expressao':
-		root.data = 'VISITADO'
-	
-	tem_else = True
-	
-	res = []
-	
-	# Percorre árvore e armazena em res o código intermediário
-	if(root.data == 'simples-decl'):
-		for child in root.children:
-			if child.data == 'else':
-				tem_else = True
-			else:
-				tem_else = False
-			
-	if tem_else:
-		for child in root.children:	
-			if child.data == 'EQ':
-				res.insert(0,'bne')	
-			elif child.children != []:
-				t_if(child)
-	
-	gera_codigo(res)	
-
 # Gera código MIPS para invocação de funções
 def t_ativacao(root):
 	
@@ -165,68 +205,11 @@ def t_ativacao(root):
 	
 	gera_codigo(res)
 
-# Gera código em linguagem intermediária			
-def t_translate(root):
-	# Marca nós visitados para eles não serem visitados novamente por t_traduz
-	if root.data == 'expressao':
-		root.data = 'VISITADO'
-	
-	# Armazenamos em res o comando em linguagem intermediária
-	res = []
-	registrador = None
-	registrador2  = None
-	
-	i=1;# adicionado 27/12
-	
-	
-	# Percorre árvore e armazena em res o código intermediário
-	for child in root.children:
-		if child.data == '=':
-			res.insert(0,'ld')
-			registrador = '$t0'
-		elif child.data == '+':
-			res.insert(0,'add')
-			registrador = '$t0'
-		elif child.data == '*':
-			res.insert(0,'mul')
-		elif child.data == '/':
-			res.insert(0,'div')
-		elif child.data =='while':
-			res.insert(0,'while:')	
-		elif child.data == 'return':
-			res.insert(0, 'jr $ra')			
-		elif child.data == 'expressao':
-			registrador2 = t_translate(child)
-		elif len(root.children) == 1:
-			res.append('li')
-			res.append('$t'+str(i))
-			res.append(child.data)
-		elif child.data.isnumeric():
-			res.append(['li', '$t'+str(i),child.data])
-			i+=1# adicionado 27/12
-			#res.append(child.data)
-			#registrador = '$t'+str(i)
-			
-		
-	if registrador2 != None:
-		res.append(registrador2)
-	if registrador != None:
-		res.insert(1,registrador)
-	
-	gera_codigo(res)	
-	#print(res)		
-	return registrador
-	
-
-
-	
-
-	
-		
 
 # Recebe como argumento o código intermediário
 # Imprime o código como MIPS
 def gera_codigo(codigo):
+
 	i=0
 	fim = " "
 	
