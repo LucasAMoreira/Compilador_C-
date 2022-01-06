@@ -26,7 +26,7 @@ O método devolve o novo valor de n.
 int remover (int k, int n, int v[]) {
   int j;
   j = k+1;
-  while ( j < n; ++j) {
+  while ( j < n) {
     v[j-1] = v[j];
     j = j + 1;
   }
@@ -81,7 +81,8 @@ int tirarzero (int n, int v[]) {
 /* Multiplicação recursiva */
   int multr (int m, int n)
   {
-    int r = 1;
+    int r;
+    r = 1;
 
     if(n == 0)
       return 0;
@@ -134,10 +135,10 @@ void quickSort(int A[], int p, int r)
 int input(int d) {
   int q; int r; int e;
 
-  e = d % 2;
+  e = d / 2;
 
   q = 500/d;
-  r = 400%d;
+  r = 400/d;
 
   if (e == 0)
    return r;
