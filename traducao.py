@@ -29,25 +29,32 @@ def t_traduz(root):
 	if root:
 		if(root.data == 'ativacao'):
 			t_ativacao(root)
+			
 		elif(root.data == 'expressão-decl'):			
 			t_expr_decl(root)
-			gera_codigo(comando)
+			if(len(comando)>=3):
+				gera_codigo(comando)
 			comando.clear()
+			
 		elif(root.data == 'retorno_decl'):			
 			t_retorno_decl(root)
 			if len(aux)==3:
 				gera_codigo(aux)
-			restaura_sp()
-			t_return(root)
+			if sp>0:
+				restaura_sp()
+				t_return(root)
 			aux.clear()
 			comando.clear()
+			
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
+			
 		elif(root.data == 'expressao'):				
 			t_expr(root)
 			if len(comando)>1:
 				gera_codigo(comando)
 			comando.clear()
+			
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
 		elif(root.data == 'else'):
