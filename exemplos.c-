@@ -24,15 +24,14 @@ O método devolve o novo valor de n.
 */
 
 int remover (int k, int n, int v[]) {
-int j;
-j = k+1;
-while ( j < n; ++j) {
-v[j-1] = v[j];
-j= j + 1;
-}
-return n-1;
-}
-}
+  int j;
+  j = k+1;
+  while ( j < n; ++j) {
+    v[j-1] = v[j];
+    j = j + 1;
+  }
+  return n-1;
+  }
 
 /* A função tirazeros elimina todos os elementos nulos
  de v[0..n-1]. Ele supõe que n >= 0.
@@ -41,7 +40,8 @@ O método deixa o resultado em v[0..i-1] e devolve i.
 
 int tirazeros (int n, int v[])
 {
-   int i, j;
+   int i;
+   int j;
    i = 0;
    j = 0;
    while (j < n){
@@ -63,11 +63,11 @@ int tira0 (int n, int v[]) {
    int i; int z;
    z = 0;
    i = 0;
-   while( i < n - z) {
+   while( i < (n - z)) {
       if (v[i] == 0) {
          z = z +  1;
          k = i;
-         while (k < n - z) {
+         while (k < (n - z)) {
          v[k] = v[k+1];
          k = k + 1;
         }
@@ -93,36 +93,34 @@ int tira0 (int n, int v[]) {
 QuickSort -- ordenacao rapida. Desafio!
 */
 
-
-
-int particao(int [] A, int p, int r)
+int particao(int A[], int p, int r)
 {
- int x; int i; int j; int temp;
+  int x; int i; int j; int temp;
 
- x = A[r]; /* pivo */
- i = p - 1;
- j=p;
- while( j <= r-1) {
- if(A[j] >= x)
-  {
-   i = i+1;
-   /* trocar */
-   temp = A[i];
-   A[i] = A[j];
-   A[j] = temp;
+  x = A[r]; /* pivo */
+  i = p - 1;
+  j=p;
+  while( j <= (r-1)) {
+  if(A[j] >= x)
+    {
+      i = i+1;
+      /* trocar */
+      temp = A[i];
+      A[i] = A[j];
+      A[j] = temp;
+    }
+    j = j + 1;
   }
-  j = j + 1;
- }
-
 
  /* reposicionar o pivo */
-     temp = A[i+1];
-     A[i+1] = A[r];
-     A[r] = temp;
-return (i+1);
+  temp = A[i+1];
+  A[i+1] = A[r];
+  A[r] = temp;
+
+  return (i+1);
 }
 
-void quickSort(int [] A, int p, int r)
+void quickSort(int A[], int p, int r)
 {
   int q;
   if( p < r )
@@ -150,65 +148,65 @@ int input(int d) {
 void output(int p) {
 /* Imprime o parâmetro p */
 /* Essa função pode fazer já parte do seu compilador C-
-...
+...*/
 }
 
 void main(void) {
-int i; int ret;
-i = 0;
-while(i<10) {
-  x[i] = input(i);
-  i = i + 1;
-}
-quickSort(x,0,10);
+  int i; int ret;
+  i = 0;
+  while(i<10) {
+    x[i] = input(i);
+    i = i + 1;
+  }
+  quickSort(x,0,10);
 
-/* Imprime vetor  */
-while (i < 10)
-{
-output(x[i]);
-i = i +1;
-}
+  /* Imprime vetor  */
+  while (i < 10)
+  {
+    output(x[i]);
+    i = i +1;
+  }
 
-ret = insere(3, 4, 10, x);
-output(ret);
+  ret = insere(3, 4, 10, x);
+  output(ret);
 
-/* Imprime vetor  */
-while (i < ret)
-{
-output(x[i]);
-i = i +1;
-}
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
 
-ret = remover(3, 4, 10, x);
-output(ret);
+  ret = remover(3, 4, 10, x);
+  output(ret);
 
-/* Imprime vetor  */
-while (i < ret)
-{
-output(x[i]);
-i = i +1;
-}
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
 
 
-ret = tirazeros(10, x);
-output(ret);
+  ret = tirazeros(10, x);
+  output(ret);
 
-/* Imprime vetor  */
-while (i < ret)
-{
-output(x[i]);
-i = i +1;
-}
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
 
-ret = tira0(10, x);
-output(ret);
+  ret = tira0(10, x);
+  output(ret);
 
-/* Imprime vetor  */
-while (i < ret)
-{
-output(x[i]);
-i = i +1;
-}
-ret = multr(3,4);
-output(ret);
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+  ret = multr(3,4);
+  output(ret);
 }
