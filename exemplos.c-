@@ -1,0 +1,213 @@
+/*
+Esta função insere x entre v[k-1] e v[k]
+no vetor v[0..n-1]. O método supõe apenas que
+0 <= k <= n. Ele devolve valor de n atualizado.
+*/
+
+int inserir (int k, int x, int n, int v[])
+{
+   int j;
+   j = n;
+    while (j > k) {
+    v[j] = v[j-1];
+    j = j -1;
+    }
+   v[k] = x;
+   return n + 1;
+}
+
+
+/*
+Este função recebe 0 <= k < n e remove
+o elemento v[k] do vetor v[0..n-1].
+O método devolve o novo valor de n.
+*/
+
+int remover (int k, int n, int v[]) {
+  int j;
+  j = k+1;
+  while ( j < n) {
+    v[j-1] = v[j];
+    j = j + 1;
+  }
+  return n-1;
+  }
+
+/* A função tirazeros elimina todos os elementos nulos
+ de v[0..n-1]. Ele supõe que n >= 0.
+O método deixa o resultado em v[0..i-1] e devolve i.
+*/
+
+int tirazeros (int n, int v[])
+{
+   int i;
+   int j;
+   i = 0;
+   j = 0;
+   while (j < n){
+   if (v[j] != 0)
+      {
+       v[i] = v[j];
+       i = i + 1;
+      }
+      j = j + 1;
+   }
+
+   return i;
+}
+
+/* Elimina os zeros de v[0..n-1].
+ Deixa o resultado em v[0..m-1] e devolve m.
+*/
+int tirarzero (int n, int v[]) {
+   int i; int z;
+   z = 0;
+   i = 0;
+   while( i < (n - z)) {
+      if (v[i] == 0) {
+         z = z +  1;
+         k = i;
+         while (k < (n - z)) {
+         v[k] = v[k+1];
+         k = k + 1;
+        }
+        i = i - 1;
+      }
+      i = i + 1;
+   }
+   return n - z;
+}
+
+/* Multiplicação recursiva */
+  int multr (int m, int n)
+  {
+    int r;
+    r = 1;
+
+    if(n == 0)
+      return 0;
+    else
+      return (m + multr(m, n-1));
+  }
+
+/*
+QuickSort -- ordenacao rapida. Desafio!
+*/
+
+int particao(int A[], int p, int r)
+{
+  int x; int i; int j; int temp;
+
+  x = A[r]; /* pivo */
+  i = p - 1;
+  j=p;
+  while( j <= (r-1)) {
+  if(A[j] >= x)
+    {
+      i = i+1;
+      /* trocar */
+      temp = A[i];
+      A[i] = A[j];
+      A[j] = temp;
+    }
+    j = j + 1;
+  }
+
+ /* reposicionar o pivo */
+  temp = A[i+1];
+  A[i+1] = A[r];
+  A[r] = temp;
+
+  return (i+1);
+}
+
+void quickSort(int A[], int p, int r)
+{
+  int q;
+  if( p < r )
+  {
+    q = particao(A, p, r);
+    quickSort(A, p, q-1);
+    quickSort(A, q+1, r);
+  }
+}
+
+int input(int d) {
+  int q; int r; int e;
+
+  e = d / 2;
+
+  q = 500/d;
+  r = 400/d;
+
+  if (e == 0)
+   return r;
+  else
+    return q;
+}
+
+void output(int p) {
+/* Imprime o parâmetro p */
+/* Essa função pode fazer já parte do seu compilador C-
+...*/
+}
+
+void main(void) {
+  int i; int ret;
+  i = 0;
+  while(i<10) {
+    x[i] = input(i);
+    i = i + 1;
+  }
+  quickSort(x,0,10);
+
+  /* Imprime vetor  */
+  while (i < 10)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+
+  ret = insere(3, 4, 10, x);
+  output(ret);
+
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+
+  ret = remover(3, 4, 10, x);
+  output(ret);
+
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+
+
+  ret = tirazeros(10, x);
+  output(ret);
+
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+
+  ret = tirarzero(10, x);
+  output(ret);
+
+  /* Imprime vetor  */
+  while (i < ret)
+  {
+    output(x[i]);
+    i = i +1;
+  }
+  ret = multr(3,4);
+  output(ret);
+}
