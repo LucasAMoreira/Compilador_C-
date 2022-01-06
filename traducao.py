@@ -8,9 +8,13 @@
 global args
 global var
 global sp
+global argumentos
+global flag # Uso geral
+flag = False
 
 args = []
 var = []
+argumentos = []
 sp=0
 
 global comando
@@ -36,6 +40,7 @@ def t_traduz(root):
 			restaura_sp()
 			t_return(root)
 			aux.clear()
+			comando.clear()
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
 		elif(root.data == 'expressao'):				
@@ -54,12 +59,25 @@ def t_traduz(root):
 			t_params(root)
 			get_params(root)
 		elif(root.data == 'args'):
+			argumentos.clear()
+			get_args(root)
+			print(argumentos)
 			t_args(root)
 			
 		for child in root.children:
 			t_traduz(child)			
 	return root
 
+
+def get_args(root):
+	
+	
+	for child in root.children:
+		if child.children == [] and child.data != ',':
+			argumentos.append(child.data)
+									
+	for child in root.children:
+		args = get_args(child)
 
 def t_args(root):
 	if(root.data in args):
@@ -95,10 +113,19 @@ def t_expr_decl(root):
 	if root.data.isnumeric():
 		comando.insert(0,'li')
 		comando.append(root.data)
+			
+	elif root.data == '+':
+		comando.insert(0,'add')		
+	elif root.data == '-':
+		comando.insert(0,'sub')		
+	elif root.data == '*':
+		comando.insert(0,'mul')
+	elif root.data == '/':
+		comando.insert(0,'div')
 		
 	if root.data in var:
 		index = var.index(root.data)
-		comando.insert(1,'$s'+str(index))
+		comando.append('$s'+str(index))
 				
 	for child in root.children:
 		t_expr_decl(child)
@@ -130,6 +157,7 @@ def t_retorno_decl(root):
 	#	print('EXPR')
 	#	aux=t_expr(root)
 	
+	'''
 	if(root.children == [] and root.data != 'return'):
 		# Se retorna um dos argumentos recebidos
 		if(root.data in args):
@@ -138,8 +166,15 @@ def t_retorno_decl(root):
 			aux.insert(1,'$v0')
 			aux.insert(2,'$a'+str(index))
 			return aux
+	'''
 	if(root.data== 'expressao'):
 		t_expr(root)
+	elif(root.data in args):
+		index = args.index(root.data)
+		aux.insert(0,'move')
+		aux.insert(1,'$v0')
+		aux.insert(2,'$a'+str(index))
+		return aux
 	'''
 	if(root.data == 'expressao'):
 		retorno = True
@@ -228,6 +263,36 @@ def t_params(root):
 			register = '$a'+ str(j)
 			i-=4
 			j+=1
+
+
+# Gera código MIPS para os parâmetros
+def t_encerra(root):
+	params = params_count(root)
+	res = []
+	# Se é um método void não faz nada
+	if params > 0:
+		# Salva novo topo da pilha
+		global sp
+		sp = (params*-4)-4
+		res.insert(0,'addi')
+		res.append('$sp')
+		res.append('$sp')
+		res.append(sp)
+		gera_codigo(res)
+		# Salva registradores na moldura
+		i=-1*(sp+4)
+		j = 0
+		register = '$ra'
+		while i>=0:
+			res=[]
+			res.insert(0,'sw')
+			res.append(register)
+			res.append(str(i)+'($sp)')
+			gera_codigo(res)
+			register = '$a'+ str(j)
+			i-=4
+			j+=1
+
 		
 
 # EM DESENVOLVIMENTO Gera código em linguagem intermediária			
@@ -244,12 +309,28 @@ def t_expr(root):
 		comando.append('$zero')
 	elif(root.data in args):		
 		indice = args.index(root.data)
-		comando.append('$a'+str(indice))				
-	elif root.data in ['+','-','*','/']:
-		t_expressao(root)
+		comando.append('$a'+str(indice))
+			
+	elif root.data == '+':
+		comando.clear()
+		comando.insert(0,'add')		
+	elif root.data == '-':
+		comando.clear()
+		comando.insert(0,'sub')	
+	elif root.data == '*':
+		comando.clear()
+		comando.insert(0,'mul')
+	elif root.data == '/':
+		comando.clear()
+		comando.insert(0,'div')
+				
+	#elif root.data in ['+','-','*','/']:		
+	#	t_expressao(root)
+		
 	#Percorre a árvore 
-	for child in reversed(root.children):		
+	for child in  (root.children):				
 		t_expr(child)
+		
 	
 	if('else' not in comando and len(comando)==3):
 		comando.append('else')	
@@ -263,6 +344,7 @@ def t_expressao(root):
 		
 	if root.data == '+':
 		comando.insert(0,'add')
+		gera_codigo(comando)		
 	elif root.data == '-':
 		comando.clear()
 		comando.insert(0,'sub')
@@ -283,7 +365,7 @@ def t_expressao(root):
 
 	# Percorre a árvore 
 	for child in reversed(root.children):		
-		t_expr(child)
+		t_expressao(child)
 				
 	return comando	
 		
