@@ -59,7 +59,7 @@ int tirazeros (int n, int v[])
 /* Elimina os zeros de v[0..n-1].
  Deixa o resultado em v[0..m-1] e devolve m.
 */
-int tira0 (int n, int v[]) {
+int tirarzero (int n, int v[]) {
    int i; int z;
    z = 0;
    i = 0;
@@ -198,7 +198,7 @@ void main(void) {
     i = i +1;
   }
 
-  ret = tira0(10, x);
+  ret = tirarzero(10, x);
   output(ret);
 
   /* Imprime vetor  */
