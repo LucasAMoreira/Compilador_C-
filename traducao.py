@@ -31,17 +31,25 @@ def t_traduz(root):
 			comando.clear()
 		elif(root.data == 'retorno_decl'):			
 			t_retorno_decl(root)
-			comando.clear()
+			if len(aux)==3:
+				gera_codigo(aux)
+			restaura_sp()
+			t_return(root)
+			aux.clear()
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
 		elif(root.data == 'expressao'):				
 			t_expr(root)
+			if len(comando)>1:
+				gera_codigo(comando)
+			comando.clear()
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
-		
-		elif(root.data == 'seleção-decl'):
-			t_if(root)
-			comando.clear()
+		elif(root.data == 'else'):
+			gera_codigo(['else:'])
+		#elif(root.data == 'seleção-decl'):
+		#	t_if(root)
+		#	comando.clear()
 		elif(root.data == 'params'):
 			t_params(root)
 			get_params(root)
@@ -130,6 +138,8 @@ def t_retorno_decl(root):
 			aux.insert(1,'$v0')
 			aux.insert(2,'$a'+str(index))
 			return aux
+	if(root.data== 'expressao'):
+		t_expr(root)
 	'''
 	if(root.data == 'expressao'):
 		retorno = True
@@ -154,37 +164,7 @@ def t_retorno_decl(root):
 		
 	
 	
-# Gera código MIPS para IF
-def t_if(root):
 
-	# Resposta
-	res = []
-
-	if root.data == 'expressao':
-		res=t_expr(root)
-		
-	elif(root.data == 'retorno_decl'):
-		res=t_retorno_decl(root)
-		if(len(res)>1 and len(res)<5)or 'else:' in res:
-			gera_codigo(res)
-		restaura_sp()
-		t_return(root)
-		aux.clear()
-	elif(root.data == 'else'):
-		res.append('else:')
-	for child in root.children:	
-		t_if(child)
-		'''
-		if valor:
-			if valor == 'bne' or valor == 'beq':
-				res.insert(0,t_if(child))
-			else:
-				res.append(t_if(child))
-		'''
-		if('else' not in res and len(res)==3):
-			res.append('else')	
-	if(len(res)>1 and len(res)<5)or 'else:' in res:
-		gera_codigo(res)
 	
 # Recebe um nó 'fun_declaração' e gera rótulo MIPS
 # EX: 'funcao()' -> 'funcao:'
@@ -266,31 +246,35 @@ def t_expr(root):
 		indice = args.index(root.data)
 		comando.append('$a'+str(indice))				
 	elif root.data in ['+','-','*','/']:
-		res=t_expressao(root)
+		t_expressao(root)
 	#Percorre a árvore 
-	for child in root.children:		
+	for child in reversed(root.children):		
 		t_expr(child)
-				
+	
+	if('else' not in comando and len(comando)==3):
+		comando.append('else')	
+	
 	return comando	
 		
 def t_expressao(root):
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
 	if root.data == 'expressao':
 		root.data = 'VISITADO'
-	
+		
 	if root.data == '+':
 		comando.insert(0,'add')
 	elif root.data == '-':
 		comando.clear()
 		comando.insert(0,'sub')
-		print(comando)	
+		gera_codigo(comando)	
 	elif root.data == '*':
 		comando.clear()
 		comando.insert(0,'mul')
+		gera_codigo(comando)
 	elif root.data == '/':
 		comando.clear()
 		comando.insert(0,'div')
-		print(comando)
+		gera_codigo(comando)
 	elif root.data == '0':
 		comando.append('$zero')
 	elif(root.data in args):		
@@ -298,7 +282,7 @@ def t_expressao(root):
 		comando.append('$a'+str(indice))				
 
 	# Percorre a árvore 
-	for child in root.children:		
+	for child in reversed(root.children):		
 		t_expr(child)
 				
 	return comando	
