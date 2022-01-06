@@ -31,18 +31,26 @@ def t_traduz(root):
 			t_ativacao(root)
 			
 		elif(root.data == 'expressão-decl'):			
-			t_expr_decl(root)
-			if(len(comando)>=3):
+			t_expr_decl(root)			
+			#if len(comando)>1 and len(comando)<4:
+			gera_codigo(comando)
+			comando.clear()
+			
+		elif(root.data == 'iteracao_decl'):
+			t_iteracao_decl(root)
+			if len(comando)>1 and len(comando)<4:
 				gera_codigo(comando)
 			comando.clear()
 			
 		elif(root.data == 'retorno_decl'):			
 			t_retorno_decl(root)
-			if len(aux)==3:
-				gera_codigo(aux)
-			if sp>0:
+			if len(comando)>1 and len(comando)<4:
+				gera_codigo(comando)
+			
+			if sp!=0:
 				restaura_sp()
-				t_return(root)
+			t_return(root)
+			#t_encerra(root)
 			aux.clear()
 			comando.clear()
 			
@@ -51,30 +59,40 @@ def t_traduz(root):
 			
 		elif(root.data == 'expressao'):				
 			t_expr(root)
-			if len(comando)>1:
+			if len(comando)>1 and len(comando)<4:
 				gera_codigo(comando)
 			comando.clear()
 			
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
+			
 		elif(root.data == 'else'):
 			gera_codigo(['else:'])
-		#elif(root.data == 'seleção-decl'):
-		#	t_if(root)
-		#	comando.clear()
+
 		elif(root.data == 'params'):
 			t_params(root)
 			get_params(root)
-		elif(root.data == 'args'):
-			argumentos.clear()
-			get_args(root)
-			print(argumentos)
-			t_args(root)
+			comando.clear()
+		#elif(root.data == 'args'):
+		#	argumentos.clear()
+		#	get_args(root)
+		#	print(argumentos)
+		#	t_args(root)
 			
 		for child in root.children:
 			t_traduz(child)			
 	return root
 
+def t_iteracao_decl(root):
+	if(root.data == 'while'):
+		gera_codigo(['while:'])
+	if(root.data == 'expressao'):
+		t_expr_while(root)
+		if len(comando)>1 and len(comando)<4:
+				gera_codigo(comando)
+		
+	for child in root.children:
+		t_iteracao_decl(child)
 
 def get_args(root):
 	
@@ -129,6 +147,8 @@ def t_expr_decl(root):
 		comando.insert(0,'mul')
 	elif root.data == '/':
 		comando.insert(0,'div')
+	
+
 		
 	if root.data in var:
 		index = var.index(root.data)
@@ -292,7 +312,7 @@ def t_encerra(root):
 		register = '$ra'
 		while i>=0:
 			res=[]
-			res.insert(0,'sw')
+			res.insert(0,'lw')
 			res.append(register)
 			res.append(str(i)+'($sp)')
 			gera_codigo(res)
@@ -330,7 +350,10 @@ def t_expr(root):
 	elif root.data == '/':
 		comando.clear()
 		comando.insert(0,'div')
-				
+		
+	elif root.data in ['>','<','>=','<=']:	
+		comando.clear()
+		comando.insert(0,'slt')
 	#elif root.data in ['+','-','*','/']:		
 	#	t_expressao(root)
 		
@@ -343,6 +366,34 @@ def t_expr(root):
 		comando.append('else')	
 	
 	return comando	
+
+# EM DESENVOLVIMENTO Gera código em linguagem intermediária			
+def t_expr_while(root):
+	# Marca nós visitados para eles não serem visitados novamente por t_traduz
+	if root.data == 'expressao':
+		root.data = 'VISITADO'
+	
+	if root.data == 'EQ':
+		comando.insert(0,'bne')	
+	elif(root.data == 'NE'):	
+		comando.insert(0,'beq')
+	elif root.data == '0':
+		comando.append('$zero')
+	elif root.data in ['>','<','>=','<=']:	
+		comando.clear()
+		comando.insert(0,'slt')
+
+	#Percorre a árvore 
+	for child in  (root.children):				
+		t_expr(child)		
+	
+	if('fim' not in comando and len(comando)==2):
+		comando.append('$s1')
+		comando.append('fim')	
+	
+	return comando	
+	
+
 		
 def t_expressao(root):
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
