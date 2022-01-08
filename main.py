@@ -40,6 +40,11 @@ else:
 
 	# Cria parser com as expressões regulares de glc
 	parser = glc.parser
+	
+	# Cria arquivo onde será armazenado código MIPS
+	arquivo = open("codigo.asm","w")
+	arquivo.write("# ACH2087 - 2021\n# Código MIPS\n# GitHub: LucasAMoreira/Compilador_C-\n")
+	arquivo.close()
 
 	try:
 		teste = parser.parse(programa, lexer=lexer)
@@ -48,8 +53,9 @@ else:
 		print("######################")
 		#tree = substitute(tree)
 		#tree = simple_ast(tree)
+		tree.print_tree()
 		tree = t_traduz(tree)
-		#tree.print_tree()
+		
 		#decl = retornaOp(tree)
 		#print(decl)
 		'''

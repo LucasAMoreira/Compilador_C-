@@ -32,20 +32,22 @@ def t_traduz(root):
 			
 		elif(root.data == 'expressão-decl'):			
 			t_expr_decl(root)			
-			#if len(comando)>1 and len(comando)<4:
-			gera_codigo(comando)
+			if  len(comando)>1 and len(comando)<=4:
+				if comando[0].find('$') == -1:
+					gera_codigo(comando)
 			comando.clear()
 			
 		elif(root.data == 'iteracao_decl'):
 			t_iteracao_decl(root)
-			if len(comando)>1 and len(comando)<4:
+			if len(comando)>1 and len(comando)<=4:
 				gera_codigo(comando)
 			comando.clear()
 			
 		elif(root.data == 'retorno_decl'):			
 			t_retorno_decl(root)
-			if len(comando)>1 and len(comando)<4:
+			if len(comando)>1 and len(comando)<=4:
 				gera_codigo(comando)
+				comando.clear()
 			
 			if sp!=0:
 				restaura_sp()
@@ -56,15 +58,17 @@ def t_traduz(root):
 			
 		elif(root.data == 'fun-declaração'):
 			t_function(root)
+			comando.clear()
 			
 		elif(root.data == 'expressao'):				
 			t_expr(root)
-			if len(comando)>1 and len(comando)<4:
+			if len(comando)>1 and len(comando)<=4:
 				gera_codigo(comando)
 			comando.clear()
 			
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
+			
 			
 		elif(root.data == 'else'):
 			gera_codigo(['else:'])
@@ -90,13 +94,11 @@ def t_iteracao_decl(root):
 		t_expr_while(root)
 		if len(comando)>1 and len(comando)<4:
 				gera_codigo(comando)
-		
+				comando.clear()
 	for child in root.children:
 		t_iteracao_decl(child)
 
-def get_args(root):
-	
-	
+def get_args(root):	
 	for child in root.children:
 		if child.children == [] and child.data != ',':
 			argumentos.append(child.data)
@@ -448,8 +450,11 @@ def t_ativacao(root):
 # Imprime o código como MIPS
 def gera_codigo(codigo):
 
+
+
 	i=0
 	fim = " "
+	arquivo = open("codigo.asm","a")
 	
 	# Percorre código.
 	# Caso haja uma lista dentro (EX: 'li'), a imprime primeiro
@@ -461,10 +466,13 @@ def gera_codigo(codigo):
 				if j < len(array)-1 and j>0:
 					fim = ", "
 				print(array[j], end=fim)
+				cod = array[j]+fim
+				arquivo.write(cod)
 				fim = " "
 				j+=1
 			codigo.insert(i,array[1])
-			codigo.pop(i+1)			
+			codigo.pop(i+1)
+			arquivo.write("\n","a")			
 			print()	
 		i+=1
 	
@@ -474,11 +482,15 @@ def gera_codigo(codigo):
 		if k>0 and k< len(codigo)-1:
 			fim=", " 
 		print(codigo[k], end=fim)
+		
+		cod = str(codigo[k])+fim
+		arquivo.write(cod)
 		fim =" "
 		k+=1
 	if codigo != []:
 		print()
-		
+		arquivo.write("\n")
+	arquivo.close()
 
 def get_operation(root):
 	if(root.data in ['+','-','/','*']):
