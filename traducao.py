@@ -50,6 +50,7 @@ def t_traduz(root):
 				comando.clear()
 			
 			if sp!=0:
+				t_encerra()
 				restaura_sp()
 			t_return(root)
 			#t_encerra(root)
@@ -203,6 +204,8 @@ def t_retorno_decl(root):
 		aux.insert(0,'move')
 		aux.insert(1,'$v0')
 		aux.insert(2,'$a'+str(index))
+		gera_codigo(aux)
+		aux.clear()
 		return aux
 	'''
 	if(root.data == 'expressao'):
@@ -295,32 +298,19 @@ def t_params(root):
 
 
 # Gera código MIPS para os parâmetros
-def t_encerra(root):
-	params = params_count(root)
-	res = []
-	# Se é um método void não faz nada
-	if params > 0:
-		# Salva novo topo da pilha
-		global sp
-		sp = (params*-4)-4
-		res.insert(0,'addi')
-		res.append('$sp')
-		res.append('$sp')
-		res.append(sp)
+def t_encerra():
+	i=-1*(sp+4)
+	j = 0
+	register = '$ra'
+	while i>=0:
+		res=[]
+		res.insert(0,'lw')
+		res.append(register)
+		res.append(str(i)+'($sp)')
 		gera_codigo(res)
-		# Salva registradores na moldura
-		i=-1*(sp+4)
-		j = 0
-		register = '$ra'
-		while i>=0:
-			res=[]
-			res.insert(0,'lw')
-			res.append(register)
-			res.append(str(i)+'($sp)')
-			gera_codigo(res)
-			register = '$a'+ str(j)
-			i-=4
-			j+=1
+		register = '$a'+ str(j)
+		i-=4
+		j+=1
 
 		
 
@@ -450,8 +440,6 @@ def t_ativacao(root):
 # Imprime o código como MIPS
 def gera_codigo(codigo):
 
-
-
 	i=0
 	fim = " "
 	arquivo = open("codigo.asm","a")
@@ -492,14 +480,6 @@ def gera_codigo(codigo):
 		arquivo.write("\n")
 	arquivo.close()
 
-def get_operation(root):
-	if(root.data in ['+','-','/','*']):
-		print('É TRUEEEEEEEE')
-		is_arit = True
-	elif(root.data in ['EQ','NE']):
-		is_arit= False
-	for child in root.children:
-		is_arit=get_operation(child)
-	return is_arit
+
 	
 	
