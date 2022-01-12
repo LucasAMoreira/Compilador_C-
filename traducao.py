@@ -499,14 +499,23 @@ def get_operation(root):
 	if root.data == 'soma_expressao':
 		root.data = 'VISITADO'
 	i=0
+	res = None
 	for child in reversed(root.children):
 		for grandchild in (child.children):
+			#print(comando)
 			percorre(grandchild)
-			comando.insert(1,'$t'+str(i))
-			if len(comando)==4:
+			if len(comando) <= 4:
+				comando.insert(1,'$t'+str(i))
+			if len(comando) > 4:
+				comando.pop(2)
+
+			if len(comando)>=4:
 				gera_codigo(comando)
+				res = comando[1] # Último registrador
+				#print(res)
 				comando.clear()
-			i+=1
+				comando.append(res)
+				i+=1
 
 '''
 IDEIA
