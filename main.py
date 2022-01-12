@@ -3,7 +3,7 @@ import ply.lex as lex
 import regex
 import glc
 import astree
-from AST import *
+from traducao import *
 import sys
 
 def build_tree(tokens):
