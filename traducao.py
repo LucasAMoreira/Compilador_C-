@@ -13,6 +13,11 @@ global comando		# Armazenamos registradores e comando do código MIPS
 global aux		# Armazenamos registradores e comando do código MIPS
 global iterador	# Usado para ser incrementado e auxiliar
 global aux_iter
+global reg_var
+global a
+global ops
+
+ops = []
 
 # Inicialização das variáveis globais
 args = []
@@ -23,7 +28,7 @@ comando = []
 aux = []
 iterador = 0
 aux_iter = 0
-
+reg_var = []
 # Percorre AST
 def t_traduz(root):
 	if root:
@@ -199,13 +204,16 @@ def get_vars(root):
 	for child in root.children:
 		get_vars(child)
 
-
+# Gera código para expressão declaração
+# Ex: x = 10; => li $s0, 10
 def t_expr_decl(root):
 
 	if root.data == 'expressão-decl':
 		root.data = 'VISITADO'
 
 	if root.data.isnumeric():
+		if 'add' in comando:
+			comando.remove('add')
 		comando.insert(0,'li')
 		comando.append(root.data)
 
@@ -221,13 +229,11 @@ def t_expr_decl(root):
 	if root.data in var:
 		index = var.index(root.data)
 		comando.append('$s'+str(index))
+		reg_var.append('$s'+str(index)) # Lista de variáveis
 
 	for child in root.children:
 		t_expr_decl(child)
 	return comando
-
-
-
 
 
 
@@ -236,23 +242,11 @@ def t_retorno_decl(root):
 	res = []
 	retorno = False
 
-	#if root.data == 'expressao':
-	#	print('EXPR')
-	#	aux=t_expr(root)
-
-	'''
-	if(root.children == [] and root.data != 'return'):
-		# Se retorna um dos argumentos recebidos
-		if(root.data in args):
-			index = args.index(root.data)
-			aux.insert(0,'move')
-			aux.insert(1,'$v0')
-			aux.insert(2,'$a'+str(index))
-			return aux
-	'''
 	if(root.data== 'expressao'):
 		comando.clear()
 		t_expr(root)
+	if root.data == 'ativacao':
+		t_ativacao(root)
 	elif(root.data in args):
 		index = args.index(root.data)
 		aux.insert(0,'move')
@@ -261,31 +255,12 @@ def t_retorno_decl(root):
 		gera_codigo(aux)
 		aux.clear()
 		return aux
-	'''
-	if(root.data == 'expressao'):
-		retorno = True
-	'''
-	'''
-	if(root.data == 'expressao'):
-		retorno = True
-		for child in root.children:
 
-			if(child.data in args):
-				index = args.index(child.data)
-				res.insert(0,'move')
-				res.insert(1,'$v0')
-				res.insert(2,'$a'+str(index))
-	'''
 	for child in root.children:
 		t_retorno_decl(child)
 
 	#gera_codigo(res)
 	return aux
-
-
-
-
-
 
 # Recebe um nó 'fun_declaração' e gera rótulo MIPS
 # EX: 'funcao()' -> 'funcao:'
@@ -297,6 +272,7 @@ def t_function(root):
 	# Insere 'nome_da_função' + ':' em res
 	for child in root.children:
 		if child.children == [] and child.data != '(' and child.data != ')':
+			print('ARGS: '+str(argumentos))
 			res.insert(0,"\n"+child.data+":")
 
 	gera_codigo(res)
@@ -357,12 +333,13 @@ def t_params(root):
 # EM DESENVOLVIMENTO Gera código em linguagem intermediária
 def t_expr(root):
 
-	global i
+	#global i
 
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
 	if root.data == 'expressao':
 		root.data = 'VISITADO'
 
+	# Adiciona comando de acordo com expressão
 	if root.data == 'EQ':
 		comando.insert(0,'bne')
 	elif(root.data == 'NE'):
@@ -372,10 +349,17 @@ def t_expr(root):
 	elif root.data in ['>','<','>=','<=']:
 		comando.clear()
 		comando.insert(0,'slt')
+	elif(root.data in args):
+		indice = args.index(root.data)
+		#comando.append('$t')
+		comando.append('$a'+str(indice))
+		#gera_codigo(comando)
 
 	# Adiciona 'add', 'sub', 'mul' ou 'div' em comando
 	if root.data == 'soma_expressao' and root.children[0].data == 'soma_expressao':
-		get_operation(root)
+		global reg
+		reg=get_operation(root)
+		print('REGISTRADOR: '+str(reg))
 		'''
 		print(args)
 		if(root.data in args):
@@ -399,56 +383,91 @@ def t_expr(root):
 	return comando
 
 
+def aux_ativacao(root,move):
+	#print(root.data+'------------------------------'+str(args))
+	if root.data in args:
+		move.append('$a'+str(args.index(root.data)))
+		if len(move) == 3:
+			gera_codigo(move)
+		root.data ='VISITADO'
+	if root.data in var:
+		move.append('$s'+str(var.index(root.data)))
+		if len(move) == 3:
+			gera_codigo(move)
+		root.data ='VISITADO'
+	#elif reg and root.children == []:
+	#	move.append(reg)
 
-
-def t_expressao(root):
-	# Marca nós visitados para eles não serem visitados novamente por t_traduz
-	if root.data == 'expressao':
-		root.data = 'VISITADO'
-
-	if root.data == '+':
-		comando.insert(0,'add')
-		gera_codigo(comando)
-	elif root.data == '-':
-		comando.clear()
-		comando.insert(0,'sub')
-		gera_codigo(comando)
-	elif root.data == '*':
-		comando.clear()
-		comando.insert(0,'mul')
-		gera_codigo(comando)
-	elif root.data == '/':
-		comando.clear()
-		comando.insert(0,'div')
-		gera_codigo(comando)
-	elif root.data == '0':
-		comando.append('$zero')
-	elif(root.data in args):
-		indice = args.index(root.data)
-		comando.append('$a'+str(indice))
-
-	# Percorre a árvore
-	for child in reversed(root.children):
-		t_expressao(child)
-
-	return comando
-
+	for child in root.children:
+		aux_ativacao(child,move)
 
 # Gera código MIPS para invocação de funções
 def t_ativacao(root):
+
+	# Preenche args com os argumentos da função. EX: args = ['u','v']
+	get_args(root)
+
+	if root.data=='ativacao':
+		# Preenche argumentos da função
+		i = 0
+		for arg in args:
+			move = []
+			move.append('move')
+			move.append('$a'+str(i))
+			local = aux_ativacao(root,move)
+			#print(local)
+			if reg and len(move)==2:
+				move.append(reg)
+				gera_codigo(move)
+
+			# Agora deve inserir em list de acordo com a situação
+
+			i += 1
+			#gera_codigo(move)
+
+		# Invoca função
+	res = []
+	if root.data=='ativacao':
+		res.insert(0,'jal')
+		root.data='VISITADO'
+	for child in root.children:
+		t_ativacao(child)
+
+	if res:
+		res.insert(1,root.children[0].data)
+	gera_codigo(res)
+
+
+'''
+# Gera código MIPS para invocação de funções
+def t_ativacao(root):
+
+	if root.data == 'ativacao' and reg_var != []:
+		move = []
+		get_args(root)
+		i = 0;
+		for arg in args:
+			move.append('move')
+			move.append('$a'+str(i))
+			move.append(reg_var[i])
+			i+=1
+			gera_codigo(move)
+			move.clear()
+		#print('======> ARGS: '+str(args))
 
 	res = []
 	if root.data=='ativacao':
 		res.insert(0,'jal')
 		root.data='VISITADO'
-
+	elif root.data == 'expressao':
+		t_expr(root)
 	for child in root.children:
 		t_ativacao(child)
 	if res:
 		res.insert(1,root.children[0].data)
 
 	gera_codigo(res)
-
+'''
 
 # Recebe como argumento o código intermediário
 # Imprime o código como MIPS
@@ -516,7 +535,7 @@ def get_operation(root):
 				comando.clear()
 				comando.append(res)
 				i+=1
-
+	return '$t'+str(i-1)
 '''
 IDEIA
 	global temp
