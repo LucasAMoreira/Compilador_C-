@@ -1,0 +1,63 @@
+/* Um programa para calcular o mdc
+   segundo o algoritmo de Euclides */   
+    
+   int gcd (int u, int v){
+      if (v==0) return u;
+      else return gcd(v,u-u/v*v);
+      /* u-u/v*v == u mod v */
+   }
+      
+   void main(void){
+      int x; int y;
+      x= 5; y=4;
+      output(gcd(x,y));
+   }
+   
+/*
+	.globl main
+	
+	j main
+	
+	output:
+		li $v0, 1
+		syscall
+		jr $ra
+	
+	gcd:
+		addi $sp, $sp, -12
+		sw $ra, 8($sp) # salva
+		sw $a0, 4($sp) # salva
+		sw $a1, 0($sp) # salva
+		bne $a1, $zero, else
+		move $v0, $a0
+		lw $ra, 8($sp) # restaura
+		lw $a0, 4($sp) # restaura
+		lw $a1, 0($sp) # restaura
+		addi $sp, $sp,12
+		jr $ra
+		else:
+			div $t0, $a0, $a1 # u/v	mul $t0, $a1, $a1v*v
+			mul $t1, $t0, $a1 # (u/v)*v div $t1, $a0, $t0
+			sub $t2, $a0, $t1 # u - (u/v*v) sub $t2 $a0, $t1
+			move $a0, $a1
+			move $a1, $t2
+			jal gcd
+			lw $ra, 8($sp) # restaura
+			lw $a0, 4($sp) # restaura
+			lw $a1, 0($sp) # restaura
+			addi $sp, $sp,12
+			jr $ra
+	
+	main:
+		li $s0, 5
+		li $s1, 4
+		move $a0, $s0
+		move $a1, $s1
+		jal gcd
+		move $a0, $v0
+		jal output
+		
+	fim:
+*/
+   
+   
