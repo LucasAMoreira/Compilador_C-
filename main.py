@@ -42,7 +42,7 @@ else:
 	parser = glc.parser
 
 	# Cria arquivo onde será armazenado código MIPS
-	output = '\nj main\n \noutput:\nli $v0, 1\nsyscall\njr $ra\n'
+	output = '\nj main\n \noutput:\nmove $a0, $v0\nli $v0, 1\nsyscall\njr $ra\n'
 	arquivo = open("codigo.asm","w")
 	arquivo.write("# ACH2087 - 2021\n# Código MIPS\n# GitHub: LucasAMoreira/Compilador_C-\n"+output)
 

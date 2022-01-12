@@ -383,7 +383,8 @@ def t_expr(root):
 	return comando
 
 
-def aux_ativacao(root,move):
+def aux_ativacao(root,move,i):
+
 	#print(root.data+'------------------------------'+str(args))
 	if root.data in args:
 		move.append('$a'+str(args.index(root.data)))
@@ -394,12 +395,15 @@ def aux_ativacao(root,move):
 		move.append('$s'+str(var.index(root.data)))
 		if len(move) == 3:
 			gera_codigo(move)
+			move.clear()
+			move.append('move')
+			move.append('$a'+str(i+1))
 		root.data ='VISITADO'
 	#elif reg and root.children == []:
 	#	move.append(reg)
 
 	for child in root.children:
-		aux_ativacao(child,move)
+		aux_ativacao(child,move,i)
 
 # Gera código MIPS para invocação de funções
 def t_ativacao(root):
@@ -414,11 +418,14 @@ def t_ativacao(root):
 			move = []
 			move.append('move')
 			move.append('$a'+str(i))
-			local = aux_ativacao(root,move)
+			local = aux_ativacao(root,move,i)
 			#print(local)
+			global reg
 			if reg and len(move)==2:
 				move.append(reg)
 				gera_codigo(move)
+
+				reg = None
 
 			# Agora deve inserir em list de acordo com a situação
 
