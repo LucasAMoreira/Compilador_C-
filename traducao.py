@@ -76,7 +76,6 @@ def t_traduz(root):
 		elif(root.data == 'local-declarações'):
 			get_vars(root)
 
-
 		elif(root.data == 'else'):
 			gera_codigo(['else:'])
 
@@ -84,11 +83,6 @@ def t_traduz(root):
 			t_params(root)
 			get_params(root)
 			comando.clear()
-		#elif(root.data == 'args'):
-		#	argumentos.clear()
-		#	get_args(root)
-		#	print(argumentos)
-		#	t_args(root)
 
 		for child in root.children:
 			t_traduz(child)
@@ -179,13 +173,6 @@ def get_args(root):
 	for child in root.children:
 		args = get_args(child)
 
-def t_args(root):
-	if(root.data in args):
-		print('Tô aqui')
-	for child in root.children:
-		t_args(child)
-
-
 def var_count(root):
 	n_var = 0
 	if root.data=='var-declaração':
@@ -259,7 +246,6 @@ def t_retorno_decl(root):
 	for child in root.children:
 		t_retorno_decl(child)
 
-	#gera_codigo(res)
 	return aux
 
 # Recebe um nó 'fun_declaração' e gera rótulo MIPS
@@ -272,13 +258,12 @@ def t_function(root):
 	# Insere 'nome_da_função' + ':' em res
 	for child in root.children:
 		if child.children == [] and child.data != '(' and child.data != ')':
-			print('ARGS: '+str(argumentos))
+			#print('ARGS: '+str(argumentos))
 			res.insert(0,"\n"+child.data+":")
 
 	gera_codigo(res)
 
 def get_params(root):
-
 	if root.data=='param':
 		for child in root.children:
 			if child.children == []:
@@ -325,15 +310,11 @@ def t_params(root):
 			register = '$a'+ str(j)
 			i-=4
 			j+=1
-
-
-
+	pass
 
 
 # EM DESENVOLVIMENTO Gera código em linguagem intermediária
 def t_expr(root):
-
-	#global i
 
 	# Marca nós visitados para eles não serem visitados novamente por t_traduz
 	if root.data == 'expressao':
@@ -351,46 +332,31 @@ def t_expr(root):
 		comando.insert(0,'slt')
 	elif(root.data in args):
 		indice = args.index(root.data)
-		#comando.append('$t')
 		comando.append('$a'+str(indice))
-		#gera_codigo(comando)
 
 	# Adiciona 'add', 'sub', 'mul' ou 'div' em comando
 	if root.data == 'soma_expressao' and root.children[0].data == 'soma_expressao':
 		global reg
 		reg=get_operation(root)
-		print('REGISTRADOR: '+str(reg))
-		'''
-		print(args)
-		if(root.data in args):
-			print('ROOT')
-			indice = args.index(root.data)
-			comando.append('$t')
-			comando.append('$a'+str(indice))
-			gera_codigo(comando)
-		'''
-	#elif root.data in ['+','-','*','/']:
-	#	t_expressao(root)
 
 	#Percorre a árvore
 	for child in  (root.children):
 		t_expr(child)
-
 
 	if('else' not in comando and len(comando)==3):
 		comando.append('else')
 
 	return comando
 
-
+# Gera código com comando 'move', preenchendo os registradores $aX
+# Recebe um nó (root), uma lista com o comando (move) e a iteração atual (i)
 def aux_ativacao(root,move,i):
-
-	#print(root.data+'------------------------------'+str(args))
 	if root.data in args:
 		move.append('$a'+str(args.index(root.data)))
 		if len(move) == 3:
 			gera_codigo(move)
 		root.data ='VISITADO'
+
 	if root.data in var:
 		move.append('$s'+str(var.index(root.data)))
 		if len(move) == 3:
@@ -399,15 +365,14 @@ def aux_ativacao(root,move,i):
 			move.append('move')
 			move.append('$a'+str(i+1))
 		root.data ='VISITADO'
-	#elif reg and root.children == []:
-	#	move.append(reg)
 
 	for child in root.children:
 		aux_ativacao(child,move,i)
 
+	pass
+
 # Gera código MIPS para invocação de funções
 def t_ativacao(root):
-
 	# Preenche args com os argumentos da função. EX: args = ['u','v']
 	get_args(root)
 
@@ -419,20 +384,14 @@ def t_ativacao(root):
 			move.append('move')
 			move.append('$a'+str(i))
 			local = aux_ativacao(root,move,i)
-			#print(local)
+
 			global reg
 			if reg and len(move)==2:
 				move.append(reg)
 				gera_codigo(move)
-
 				reg = None
-
-			# Agora deve inserir em list de acordo com a situação
-
-			i += 1
-			#gera_codigo(move)
-
-		# Invoca função
+			i += 1 # Agora deve inserir em list de acordo com a situação
+	# Invoca função
 	res = []
 	if root.data=='ativacao':
 		res.insert(0,'jal')
@@ -443,83 +402,6 @@ def t_ativacao(root):
 	if res:
 		res.insert(1,root.children[0].data)
 	gera_codigo(res)
-
-
-'''
-# Gera código MIPS para invocação de funções
-def t_ativacao(root):
-
-	if root.data == 'ativacao' and reg_var != []:
-		move = []
-		get_args(root)
-		i = 0;
-		for arg in args:
-			move.append('move')
-			move.append('$a'+str(i))
-			move.append(reg_var[i])
-			i+=1
-			gera_codigo(move)
-			move.clear()
-		#print('======> ARGS: '+str(args))
-
-	res = []
-	if root.data=='ativacao':
-		res.insert(0,'jal')
-		root.data='VISITADO'
-	elif root.data == 'expressao':
-		t_expr(root)
-	for child in root.children:
-		t_ativacao(child)
-	if res:
-		res.insert(1,root.children[0].data)
-
-	gera_codigo(res)
-'''
-
-# Recebe como argumento o código intermediário
-# Imprime o código como MIPS
-def gera_codigo(codigo):
-
-	i=0
-	fim = " "
-	arquivo = open("codigo.asm","a")
-
-	# Percorre código.
-	# Caso haja uma lista dentro (EX: 'li'), a imprime primeiro
-	while i < len(codigo):
-		if type(codigo[i])==list:
-			j = 0
-			array = codigo[i]
-			while j < len(array):
-				if j < len(array)-1 and j>0:
-					fim = ", "
-				print(array[j], end=fim)
-				cod = array[j]+fim
-				arquivo.write(cod)
-				fim = " "
-				j+=1
-			codigo.insert(i,array[1])
-			codigo.pop(i+1)
-			arquivo.write("\n","a")
-			print()
-		i+=1
-
-	# Imprime código
-	k = 0
-	while k < len(codigo):
-		if k>0 and k< len(codigo)-1:
-			fim=", "
-		print(codigo[k], end=fim)
-
-		cod = str(codigo[k])+fim
-		arquivo.write(cod)
-		fim =" "
-		k+=1
-	if codigo != []:
-		print()
-		arquivo.write("\n")
-	arquivo.close()
-
 
 def get_operation(root):
 	if root.data == 'soma_expressao':
@@ -542,39 +424,70 @@ def get_operation(root):
 				comando.clear()
 				comando.append(res)
 				i+=1
-	return '$t'+str(i-1)
-'''
-IDEIA
-	global temp
-	temp = []
-	percorre(root,i) # Nova assinatura
-	temp.append('$t'+str(i))
 
+	if i-1 >= 0:
+		return '$t'+str(i-1)
 
-'''
 
 def percorre(root):
 	if root.data == '+':
-		comando.clear()
 		comando.insert(0,'add')
 		root.data = 'VISITADO'
 	elif root.data == '-':
-		#comando.clear()
 		comando.insert(0,'sub')
 		root.data = 'VISITADO'
-		#gera_codigo(comando)
 	elif root.data == '*':
-		#comando.clear()
 		comando.insert(0,'mul')
 		root.data = 'VISITADO'
-		#gera_codigo(comando)
 	elif root.data == '/':
-		#comando.clear()
 		comando.insert(0,'div')
 		root.data = 'VISITADO'
-		#gera_codigo(comando)
 	elif root.data in args:
 		indice = args.index(root.data)
 		comando.append('$a'+str(indice))
 	for child in root.children:
 		percorre(child)
+
+
+# Recebe como argumento o código intermediário
+# Imprime o código como MIPS
+def gera_codigo(codigo):
+
+	i=0
+	fim = " "
+	arquivo = open("codigo.asm","a")
+
+	# Percorre código.
+	# Caso haja uma lista dentro (EX: 'li'), a imprime primeiro
+	while i < len(codigo):
+		if type(codigo[i])==list:
+			j = 0
+			array = codigo[i]
+			while j < len(array):
+				if j < len(array)-1 and j>0:
+					fim = ", "
+				#print(array[j], end=fim)
+				cod = array[j]+fim
+				arquivo.write(cod)
+				fim = " "
+				j+=1
+			codigo.insert(i,array[1])
+			codigo.pop(i+1)
+			arquivo.write("\n","a")
+			#print()
+		i+=1
+
+	# Imprime código
+	k = 0
+	while k < len(codigo):
+		if k>0 and k< len(codigo)-1:
+			fim=", "
+		#print(codigo[k], end=fim)
+		cod = str(codigo[k])+fim
+		arquivo.write(cod)
+		fim =" "
+		k+=1
+	if codigo != []:
+		#print()
+		arquivo.write("\n")
+	arquivo.close()
