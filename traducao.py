@@ -29,6 +29,7 @@ aux = []
 iterador = 0
 aux_iter = 0
 reg_var = []
+
 # Percorre AST
 def t_traduz(root):
 	if root:
@@ -221,8 +222,6 @@ def t_expr_decl(root):
 	for child in root.children:
 		t_expr_decl(child)
 	return comando
-
-
 
 # Recebe retorno_decl e gera código 'move $v0, $aX	'
 def t_retorno_decl(root):
@@ -449,45 +448,25 @@ def percorre(root):
 		percorre(child)
 
 
-# Recebe como argumento o código intermediário
-# Imprime o código como MIPS
+# Recebe como argumento lista 'codigo'
+# Escreve código MIPS no arquivo 'codigo.asm'
 def gera_codigo(codigo):
-
-	i=0
 	fim = " "
 	arquivo = open("codigo.asm","a")
 
-	# Percorre código.
-	# Caso haja uma lista dentro (EX: 'li'), a imprime primeiro
-	while i < len(codigo):
-		if type(codigo[i])==list:
-			j = 0
-			array = codigo[i]
-			while j < len(array):
-				if j < len(array)-1 and j>0:
-					fim = ", "
-				#print(array[j], end=fim)
-				cod = array[j]+fim
-				arquivo.write(cod)
-				fim = " "
-				j+=1
-			codigo.insert(i,array[1])
-			codigo.pop(i+1)
-			arquivo.write("\n","a")
-			#print()
-		i+=1
-
-	# Imprime código
 	k = 0
-	while k < len(codigo):
-		if k>0 and k< len(codigo)-1:
-			fim=", "
-		#print(codigo[k], end=fim)
-		cod = str(codigo[k])+fim
-		arquivo.write(cod)
-		fim =" "
-		k+=1
-	if codigo != []:
-		#print()
-		arquivo.write("\n")
-	arquivo.close()
+	# Percorre lista codigo
+	if codigo and '$' not in codigo[0]:
+		while k < len(codigo):
+			# Adiciona vírgula se não é o primeiro nem o último elemento
+			if k>0 and k< len(codigo)-1:
+				fim=", "
+			#print(codigo[k], end=fim)
+			cod = str(codigo[k])+fim
+			arquivo.write(cod)
+			fim =" "
+			k+=1
+		if codigo != []:
+			#print()
+			arquivo.write("\n")
+		arquivo.close()
