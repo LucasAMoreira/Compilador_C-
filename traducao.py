@@ -17,6 +17,9 @@ global reg_var
 global a
 global ops
 
+global cWhile	# Contador de while
+global funcao	# Função atual
+
 ops = []
 
 # Inicialização das variáveis globais
@@ -29,6 +32,9 @@ aux = []
 iterador = 0
 aux_iter = 0
 reg_var = []
+
+cWhile = 1
+
 
 # Percorre AST
 def t_traduz(root):
@@ -94,7 +100,9 @@ def t_traduz(root):
 # invoca t_expr_while para tratar a expressão do laço
 def t_iteracao_decl(root):
 	if(root.data == 'while'):
-		gera_codigo(['while:'])
+		global cWhile
+		gera_codigo(['while_'+funcao+'_'+str(cWhile)+':'])
+		cWhile=cWhile + 1;
 	if(root.data == 'expressao'):
 		t_expr_while(root)
 		if len(comando)>1 and len(comando)<4:
@@ -259,6 +267,10 @@ def t_function(root):
 		if child.children == [] and child.data != '(' and child.data != ')':
 			#print('ARGS: '+str(argumentos))
 			res.insert(0,"\n"+child.data+":")
+			global funcao
+			global cWhile
+			funcao = child.data
+			cWhile = 1
 
 	gera_codigo(res)
 
